@@ -4,10 +4,10 @@ set -ex
 if [ "$CREATE_CACHE" != "false" ]; then
   tmp_dir=$(mktemp -d)
   touch "$tmp_dir/tool.xml"
-  PIP_QUIET=1 planemo test --no_conda_auto_init --galaxy_source "$GALAXY_SOURCE" --galaxy_branch "$GALAXY_BRANCH" "$tmp_dir"
+  PIP_QUIET=1 planemo test --galaxy_python_version "$PYTHON_VERSION" --no_conda_auto_init --galaxy_source "$GALAXY_SOURCE" --galaxy_branch "$GALAXY_BRANCH" "$tmp_dir"
 fi
 
-if [ "$CHANGED_REPOSITORIES" == "" ]; then
+if [ "$REPOSITORIES" == "" ]; then
   # The range of commits to check for changes is:
   # - `origin/master...` for all events happening on a feature branch
   # - for events on the master branch we compare against the sha before the event
@@ -19,7 +19,8 @@ if [ "$CHANGED_REPOSITORIES" == "" ]; then
   if [ "$GITHUB_EVENT_NAME" =  "push" ]; then
     case "$GITHUB_REF" in
       refs/heads/master|refs/heads/main )
-      COMMIT_RANGE="$EVENT_BEFORE.."
+      COMMIT_RANGE="36de8aa1927d0204107371ffad76bdfe921be44a.."
+      # TODO RESTORE COMMIT_RANGE="$EVENT_BEFORE.."
       ;;
       *)
       git fetch origin master
@@ -30,27 +31,27 @@ if [ "$CHANGED_REPOSITORIES" == "" ]; then
     COMMIT_RANGE="HEAD~.."
   fi
 
-  planemo ci_find_repos --changed_in_commit_range $COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output changed_repositories.list
-  CHANGED_REPOSITORIES=$(cat changed_repositories.list)
+  planemo ci_find_repos --changed_in_commit_range $COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output repository_list.txt
+  REPOSITORIES=$(cat repository_list.txt)
 else
-  echo "$CHANGED_REPOSITORIES" > changed_repositories.list
+  echo "$REPOSITORIES" > repository_list.txt
 fi
 
 if [ "$PLANEMO_LINT_TOOLS" == "true" ]; then
-  planemo shed_lint --tools --ensure_metadata --urls --report_level warn --fail_level error --recursive "$CHANGED_REPOSITORIES"
+  planemo shed_lint --tools --ensure_metadata --urls --report_level warn --fail_level error --recursive "$REPOSITORIES"
 fi
 
 if [ "$PLANEMO_TEST_TOOLS" == "true" ]; then
   # Find tools
   touch changed_repositories_chunk.list changed_tools_chunk.list
-  if [ $(wc -l < changed_repositories.list) -eq 1 ]; then
+  if [ $(wc -l < repository_list.txt) -eq 1 ]; then
       planemo ci_find_tools --chunk_count "$CHUNK_COUNT" --chunk "$CHUNK" \
                      --output changed_tools_chunk.list \
-                     $(cat changed_repositories.list)
+                     $(cat repository_list.txt)
   else
       planemo ci_find_repos --chunk_count "$CHUNK_COUNT" --chunk "$CHUNK" \
                      --output changed_repositories_chunk.list \
-                     $(cat changed_repositories.list)
+                     $(cat repository_list.txt)
   fi
 
   # show tools
@@ -62,7 +63,7 @@ if [ "$PLANEMO_TEST_TOOLS" == "true" ]; then
           PLANEMO_OPTIONS="--biocontainers --no_dependency_resolution --no_conda_auto_init"
   fi
   if [ -s changed_tools_chunk.list ]; then
-      PIP_QUIET=1 planemo test --database_connection "$DATABASE_CONNECTION" $PLANEMO_OPTIONS --galaxy_source $GALAXY_REPO --galaxy_branch $GALAXY_RELEASE --test_output_json test_output.json $(cat changed_tools_chunk.list) || true
+      PIP_QUIET=1 planemo test --galaxy_python_version "$PYTHON_VERSION" --database_connection "$DATABASE_CONNECTION" $PLANEMO_OPTIONS --galaxy_source $GALAXY_REPO --galaxy_branch $GALAXY_RELEASE --test_output_json test_output.json $(cat changed_tools_chunk.list) || true
       docker system prune --all --force --volumes || true
   elif [ -s changed_repositories_chunk.list ]; then
       while read -r DIR; do
@@ -71,7 +72,7 @@ if [ "$PLANEMO_TEST_TOOLS" == "true" ]; then
           else
               TESTPATH="$DIR"
           fi
-          PIP_QUIET=1 planemo test --database_connection "$DATABASE_CONNECTION" $PLANEMO_OPTIONS --galaxy_source $GALAXY_REPO --galaxy_branch $GALAXY_RELEASE --test_output_json "$DIR"/test_output.json "$TESTPATH" || true
+          PIP_QUIET=1 planemo test --galaxy_python_version "$PYTHON_VERSION" --database_connection "$DATABASE_CONNECTION" $PLANEMO_OPTIONS --galaxy_source $GALAXY_REPO --galaxy_branch $GALAXY_RELEASE --test_output_json "$DIR"/test_output.json "$TESTPATH" || true
           docker system prune --all --force --volumes || true
       done < changed_repositories_chunk.list
   else
@@ -90,5 +91,5 @@ fi
 if [ "$PLANEMO_DEPLOY" == "true" ]; then
    while read -r DIR; do
        planemo shed_update --shed_target "$SHED_TARGET" --shed_key "$SHED_KEY" --force_repository_creation "$DIR" || exit 1;
-   done < changed_repositories.list
+   done < repository_list.txt
 fi

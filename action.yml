@@ -14,8 +14,11 @@ inputs:
   galaxy-source:
     description: 'Galaxy repository to use'
     default: 'https://github.com/galaxyproject/galaxy'
-  changed-repositories:
-    description: 'List of changed repositories. Only needed if running parallel jobs.'
+  python-version:
+    description: 'Python version to use'
+    default: '3.7'
+  repositories:
+    description: 'List of repositories.'
     default: ''
   lint-tools:
     descriptions: 'Lint planemo tools?'
@@ -68,7 +71,8 @@ runs:
         CREATE_CACHE: ${{ inputs.create-cache }}
         GALAXY_BRANCH: ${{ inputs.galaxy-branch }}
         GALAXY_SOURCE: ${{ inputs.galaxy-source }}
-        CHANGED_REPOSITORIES: ${{ inputs.changed-repositories}}
+        PYTHON_VERSION: ${{ inputs.python-version }}
+        REPOSITORIES: ${{ inputs.repositories}}
         CHUNK: ${{ inputs.chunk }}
         CHUNK_COUNT: ${{ inputs.chunk-count}}
         DATABASE_CONNECTION: ${{ inputs.database-connection }}
@@ -80,7 +84,7 @@ runs:
         PLANEMO_MD_REPORT: ${{ inputs.markdown-report }}
         SHED_TARGET: ${{ inputs.shed-target }}
         SHED_KEY: ${{ inputs.shed-key }}
-    - run: echo "::set-output name=changed-repositories::$(cat changed_repositories.list)"
+    - run: echo "::set-output name=repositories::$(cat repository_list.txt)"
       id: changed-repositories
       shell: bash
       
