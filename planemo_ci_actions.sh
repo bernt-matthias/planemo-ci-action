@@ -60,7 +60,7 @@ fi
 if [ "$PLANEMO_LINT_TOOLS" == "true" ]; then
   while read -r DIR; do
     planemo shed_lint --tools --ensure_metadata --urls --report_level warn --fail_level error --recursive "$DIR";
-  done < "$REPOSITORIES"
+  done < <<<"$REPOSITORIES"
 fi
 
 if [ "$PLANEMO_TEST_TOOLS" == "true" ]; then
