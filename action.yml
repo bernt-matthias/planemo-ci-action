@@ -98,7 +98,13 @@ runs:
         PLANEMO_MD_REPORT: ${{ inputs.markdown-report }}
         SHED_TARGET: ${{ inputs.shed-target }}
         SHED_KEY: ${{ inputs.shed-key }}
-    - run: echo "::set-output name=repositories::$(cat repository_list.txt)"
+    # see https://trstringer.com/github-actions-multiline-strings/
+    - run: |
+        REPOS=$(cat repository_list.txt)
+        REPOS="${REPOS//'%'/'%25'}"
+        REPOS="${REPOS//$'\n'/'%0A'}"
+        REPOS="${REPOS//$'\r'/'%0D'}"
+        echo "::set-output name=repositories::$REPOS"
       id: repositories
       shell: bash
     - run: echo "::set-output name=nchunks::$(cat nchunks.txt)"
