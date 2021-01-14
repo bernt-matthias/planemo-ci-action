@@ -30,11 +30,13 @@ if [ "$REPOSITORIES" == "" ]; then
   elif [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
     COMMIT_RANGE="HEAD~.."
   fi
+  echo $COMMIT_RANGE > commit_range.txt
 
   planemo ci_find_repos --changed_in_commit_range $COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output repository_list.txt
   REPOSITORIES=$(cat repository_list.txt)
 else
   echo "$REPOSITORIES" > repository_list.txt
+  echo "$COMMIT_RANGE" > commit_range.txt
 fi
 
 if [ "$PLANEMO_LINT_TOOLS" == "true" ]; then

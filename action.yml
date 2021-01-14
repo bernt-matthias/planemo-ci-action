@@ -55,9 +55,12 @@ inputs:
     default: 'toolshed'
 
 outputs:
-  changed-repositories:
+  repositories:
     description: 'List of changed repositories'
-    value: ${{ steps.changed-repositories.outputs.changed-repositories }}
+    value: ${{ steps.repositories.outputs.repositories }}
+  commit-range:
+    description: 'Commit range'
+    value: ${{ steps.commit_range.outputs.commit_range }}
 runs:
   using: 'composite'
   steps:
@@ -85,6 +88,8 @@ runs:
         SHED_TARGET: ${{ inputs.shed-target }}
         SHED_KEY: ${{ inputs.shed-key }}
     - run: echo "::set-output name=repositories::$(cat repository_list.txt)"
-      id: changed-repositories
+      id: repositories
       shell: bash
-      
+    - run: echo "::set-output name=commit_range::$(cat commit_range.txt)"
+      id: commit_range
+      shell: bash
