@@ -62,7 +62,7 @@ outputs:
     description: 'Commit range'
     value: ${{ steps.commit-range.outputs.commit-range }}
   repositories:
-    description: 'List of changed repositories'
+    description: 'List of repositories'
     value: ${{ steps.repositories.outputs.repositories }}
   nchunks:
     description: 'Number of chunks to use'
@@ -74,6 +74,8 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    # Install the `wheel` package so that when installing other packages which
+    # are not available as wheels, pip will build a wheel for them, which can be cached.
     - run: pip install wheel ${{ inputs.planemo-version }}
       shell: bash
     - name: run planemo actions
