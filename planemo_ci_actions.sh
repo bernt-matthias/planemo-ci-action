@@ -32,7 +32,11 @@ if [ "$REPOSITORIES" == "" ]; then
   fi
   echo $COMMIT_RANGE > commit_range.txt
 
-  planemo ci_find_repos --changed_in_commit_range $COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output repository_list.txt
+  if [ ! -z $COMMIT_RANGE ]; then
+    PLANEMO_COMMIT_RANGE="--changed_in_commit_range $COMMIT_RANGE"
+  fi
+
+  planemo ci_find_repos $PLANEMO_COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output repository_list.txt
   REPOSITORIES=$(cat repository_list.txt)
 
   touch tool_list.txt

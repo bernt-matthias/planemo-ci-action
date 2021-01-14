@@ -66,7 +66,7 @@ outputs:
     value: ${{ steps.repositories.outputs.repositories }}
   nchunks:
     description: 'Number of chunks to use'
-    value: ${{ steps.chunks.outputs.nchunks }}
+    value: ${{ steps.nchunks.outputs.nchunks }}
   chunk-list:
     description: 'Number of chunks to use'
     value: ${{ steps.chunk-list.outputs.chunk-list }}
