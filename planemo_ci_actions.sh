@@ -52,6 +52,9 @@ if [ "$REPOSITORIES" == "" ]; then
   fi
   echo $NCHUNKS > nchunks.txt
 else
+  REPOSITORIES="${REPOSITORIES//'%'/'%25'}"
+  REPOSITORIES="${REPOSITORIES//$'\n'/'%0A'}"
+  REPOSITORIES="${REPOSITORIES//$'\r'/'%0D'}"
   echo "$REPOSITORIES" > repository_list.txt
   echo "$COMMIT_RANGE" > commit_range.txt
   echo "$NCHUNKS" > nchunks.txt
