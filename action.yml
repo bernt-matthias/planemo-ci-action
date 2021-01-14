@@ -30,7 +30,7 @@ inputs:
     description: 'Upload tools to toolshed (after successfull test)?'
     default: false
   chunk-count:
-    description: 'Number of tests to run in parallel'
+    description: 'TODO REMOVE Number of tests to run in parallel'
     default: 20
   database_connection:
     description: 'Database connection to use for tests'
@@ -47,6 +47,9 @@ inputs:
   markdown-report:
     description: 'Create markdown report?'
     default: false
+  max-chunks:
+    description: 'Maximum number of chunks to use for tool tests'
+    default: 4
   shed-target:
     description: 'Which toolshed to target?'
     default: 'toolshed'
@@ -55,12 +58,19 @@ inputs:
     default: 'toolshed'
 
 outputs:
+  commit-range:
+    description: 'Commit range'
+    value: ${{ steps.commit-range.outputs.commit-range }}
   repositories:
     description: 'List of changed repositories'
     value: ${{ steps.repositories.outputs.repositories }}
-  commit-range:
-    description: 'Commit range'
-    value: ${{ steps.commit_range.outputs.commit_range }}
+  nchunks:
+    description: 'Number of chunks to use'
+    value: ${{ steps.chunks.outputs.nchunks }}
+  chunk-list:
+    description: 'Number of chunks to use'
+    value: ${{ steps.chunk-list.outputs.chunk-list }}
+
 runs:
   using: 'composite'
   steps:
@@ -78,6 +88,7 @@ runs:
         REPOSITORIES: ${{ inputs.repositories}}
         CHUNK: ${{ inputs.chunk }}
         CHUNK_COUNT: ${{ inputs.chunk-count}}
+        MAX_CHUNKS: ${{ inputs.max-chunks}}
         DATABASE_CONNECTION: ${{ inputs.database-connection }}
         PLANEMO_LINT_TOOLS: ${{ inputs.lint-tools }}
         PLANEMO_TEST_TOOLS: ${{ inputs.test-tools }}
@@ -90,6 +101,12 @@ runs:
     - run: echo "::set-output name=repositories::$(cat repository_list.txt)"
       id: repositories
       shell: bash
-    - run: echo "::set-output name=commit_range::$(cat commit_range.txt)"
-      id: commit_range
+    - run: echo "::set-output name=nchunks::$(cat nchunks.txt)"
+      id: nchunks
+      shell: bash
+    - run: echo "::set-output name=chunk-list::[$(seq -s ", " 0 $((${{ steps.nchunks.outputs.nchunks }} - 1)))]"
+      id: chunk-list
+      shell: bash
+    - run: echo "::set-output name=commit-range::$(cat commit_range.txt)"
+      id: commit-range
       shell: bash

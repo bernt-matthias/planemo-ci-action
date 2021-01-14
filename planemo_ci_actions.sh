@@ -34,9 +34,23 @@ if [ "$REPOSITORIES" == "" ]; then
 
   planemo ci_find_repos --changed_in_commit_range $COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output repository_list.txt
   REPOSITORIES=$(cat repository_list.txt)
+
+  touch tool_list.txt
+  if [ -s repository_list.txt ]; then
+    planemo ci_find_tools --output tool_list.txt $(cat repository_list.txt)
+  fi
+
+  NCHUNKS=$(wc -l < tool_list.txt)
+  if [ "$NCHUNKS" -gt "$MAX_CHUNKS" ]; then
+    NCHUNKS=$MAX_CHUNKS
+  elif [ "$NCHUNKS" -eq 0 ]; then
+    NCHUNKS=1
+  fi
+  echo $NCHUNKS > nchunks.txt
 else
   echo "$REPOSITORIES" > repository_list.txt
   echo "$COMMIT_RANGE" > commit_range.txt
+  echo "$NCHUNKS" > nchunks.txt
 fi
 
 if [ "$PLANEMO_LINT_TOOLS" == "true" ]; then
