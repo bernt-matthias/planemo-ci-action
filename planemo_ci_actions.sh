@@ -19,8 +19,7 @@ if [ "$REPOSITORIES" == "" ]; then
   if [ "$GITHUB_EVENT_NAME" =  "push" ]; then
     case "$GITHUB_REF" in
       refs/heads/master|refs/heads/main )
-      COMMIT_RANGE="36de8aa1927d0204107371ffad76bdfe921be44a.."
-      # TODO RESTORE COMMIT_RANGE="$EVENT_BEFORE.."
+      TODO RESTORE COMMIT_RANGE="$EVENT_BEFORE.."
       ;;
       *)
       git fetch origin master
@@ -40,7 +39,7 @@ if [ "$REPOSITORIES" == "" ]; then
   REPOSITORIES=$(cat repository_list.txt)
 
   # TODO check: run ci_find_tools on complete repo has the advantage that it can be reused in the linting step
-  planemo ci_find_tools $PLANEMO_COMMIT_RANGE} --exclude packages --exclude deprecated --exclude_from .tt_skip --output tool_list.txt
+  planemo ci_find_tools $PLANEMO_COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output tool_list.txt
   TOOLS=$(cat tool_list)
   # touch tool_list.txt
   # if [ -s repository_list.txt ]; then
