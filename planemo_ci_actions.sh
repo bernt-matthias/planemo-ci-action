@@ -61,6 +61,10 @@ else
 fi
 
 if [ "$PLANEMO_LINT_TOOLS" == "true" ]; then
+  echo TOOLS
+  cat tool_list.txt
+  echo REPOSITORIES
+  cat repository_list.txt
   while read -r DIR; do
     planemo shed_lint --tools --ensure_metadata --urls --report_level warn --fail_level error --recursive "$DIR";
   done < repository_list.txt
