@@ -70,8 +70,11 @@ outputs:
   tools:
     description: 'List of tools'
     value: ${{ steps.repositories.outputs.tools }}
-  chunk-list:
+  chunk-count:
     description: 'Number of chunks to use'
+    value: ${{ steps.chunk-list.outputs.chunk-count }}
+  chunk-list:
+    description: "List of chunks"
     value: ${{ steps.chunk-list.outputs.chunk-list }}
 
 runs:
