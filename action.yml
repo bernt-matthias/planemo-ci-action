@@ -56,6 +56,9 @@ inputs:
   shed-key:
     description: '(Secret!) tool shed api key'
     default: 'toolshed'
+  tools:
+    description: 'List of tools'
+    default: ''
 
 outputs:
   commit-range:
