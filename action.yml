@@ -118,7 +118,7 @@ runs:
         TOOLS="${TOOLS//$'\n'/'%0A'}"
         TOOLS="${TOOLS//$'\r'/'%0D'}"
         echo "::set-output name=tools::$TOOLS"
-      id: repositories
+      id: tools
       shell: bash
     - run: echo "::set-output name=nchunks::$(cat nchunks.txt)"
       id: nchunks
