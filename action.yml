@@ -30,7 +30,7 @@ inputs:
     description: 'Upload tools to toolshed (after successfull test)?'
     default: false
   chunk-count:
-    description: 'TODO REMOVE Number of tests to run in parallel'
+    description: 'Number of tests to run in parallel'
     default: 20
   database_connection:
     description: 'Database connection to use for tests'
@@ -47,9 +47,6 @@ inputs:
   markdown-report:
     description: 'Create markdown report?'
     default: false
-  max-chunks:
-    description: 'Maximum number of chunks to use for tool tests'
-    default: 4
   shed-target:
     description: 'Which toolshed to target?'
     default: 'toolshed'
@@ -94,6 +91,7 @@ runs:
         GALAXY_SOURCE: ${{ inputs.galaxy-source }}
         PYTHON_VERSION: ${{ inputs.python-version }}
         REPOSITORIES: ${{ inputs.repositories}}
+        TOOLS: ${{ inputs.tools }}
         CHUNK: ${{ inputs.chunk }}
         CHUNK_COUNT: ${{ inputs.chunk-count}}
         DATABASE_CONNECTION: ${{ inputs.database-connection }}
