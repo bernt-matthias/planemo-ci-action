@@ -38,6 +38,9 @@ inputs:
   chunk:
     description: 'Current test chunk'
     default: 0
+  max-chunks:
+    description: 'Maximum number of chunks to use.'
+    default: 0
   combine-outputs:
     descripttion: 'Combine multiple test reports into a single output'
     default: false
@@ -93,6 +96,7 @@ runs:
         REPOSITORIES: ${{ inputs.repositories}}
         TOOLS: ${{ inputs.tools }}
         CHUNK: ${{ inputs.chunk }}
+        MAX_CHUNKS: ${{ inputs.max-chunks}}
         CHUNK_COUNT: ${{ inputs.chunk-count}}
         DATABASE_CONNECTION: ${{ inputs.database-connection }}
         PLANEMO_LINT_TOOLS: ${{ inputs.lint-tools }}
