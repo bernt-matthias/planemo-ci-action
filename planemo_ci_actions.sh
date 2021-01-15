@@ -46,18 +46,18 @@ if [ "$REPOSITORIES" == "" ]; then
   #   planemo ci_find_tools --output tool_list.txt $(cat repository_list.txt)
   # fi
 
-  NCHUNKS=$(wc -l < tool_list.txt)
-  if [ "$NCHUNKS" -gt "$MAX_CHUNKS" ]; then
-    NCHUNKS=$MAX_CHUNKS
-  elif [ "$NCHUNKS" -eq 0 ]; then
-    NCHUNKS=1
+  CHUNK_COUNT=$(wc -l < tool_list.txt)
+  if [ "$CHUNK_COUNT" -gt "$MAX_CHUNKS" ]; then
+    CHUNK_COUNT=$MAX_CHUNKS
+  elif [ "$CHUNK_COUNT" -eq 0 ]; then
+    CHUNK_COUNT=1
   fi
-  echo $NCHUNKS > nchunks.txt
+  echo $CHUNK_COUNT > chunk_count.txt
 else
   echo "$REPOSITORIES" > repository_list.txt
   echo "$TOOLS" > tool_list.txt
   echo "$COMMIT_RANGE" > commit_range.txt
-  echo "$NCHUNKS" > nchunks.txt
+  echo "$CHUNK_COUNT" > chunk_count.txt
 fi
 
 if [ "$PLANEMO_LINT_TOOLS" == "true" ]; then
@@ -67,7 +67,7 @@ if [ "$PLANEMO_LINT_TOOLS" == "true" ]; then
   # Check if each changed tool is in the list of changed repositories
   while read -r TOOL; do
     # Check if any changed repo dir is a substring of $TOOL
-    if ! echo $TOOL | grep -qf ../workflow_artifacts/repository_list.txt; then
+    if ! echo $TOOL | grep -qf repository_list.txt; then
       echo "Tool $TOOL not in changed repositories list: .shed.yml file missing" >&2
       exit 1
     fi
@@ -75,42 +75,38 @@ if [ "$PLANEMO_LINT_TOOLS" == "true" ]; then
 fi
 
 if [ "$PLANEMO_TEST_TOOLS" == "true" ]; then
-  # Find tools
-  touch changed_repositories_chunk.list changed_tools_chunk.list
-  if [ $(wc -l < repository_list.txt) -eq 1 ]; then
-      planemo ci_find_tools --chunk_count "$CHUNK_COUNT" --chunk "$CHUNK" \
-                     --output changed_tools_chunk.list \
-                     $(cat repository_list.txt)
-  else
-      planemo ci_find_repos --chunk_count "$CHUNK_COUNT" --chunk "$CHUNK" \
-                     --output changed_repositories_chunk.list \
-                     $(cat repository_list.txt)
+  # Find tools for chunk
+  touch tool_list_chunk.txt
+  if [ -s repository_list.txt ]; then
+    planemo ci_find_tools --chunk_count $CHUNK_COUNT --chunk $CHUNK --group_tools --output tool_list_chunk.txt $(cat repository_list.txt)
   fi
 
   # show tools
-  cat changed_tools_chunk.list changed_repositories_chunk.list
-  # test tools
-  if grep -lqf .tt_biocontainer_skip changed_tools_chunk.list changed_repositories_chunk.list; then
-          PLANEMO_OPTIONS=""
-  else
-          PLANEMO_OPTIONS="--biocontainers --no_dependency_resolution --no_conda_auto_init"
+  cat tool_list_chunk.txt
+  
+  # Test tools
+  mkdir json_output
+  while read -r TOOL_GROUP; do
+    # Check if any of the lines in .tt_biocontainer_skip is a substring of $TOOL_GROUP
+    if echo $TOOL_GROUP | grep -qf .tt_biocontainer_skip; then
+      PLANEMO_OPTIONS=""
+    else
+      PLANEMO_OPTIONS="--biocontainers --no_dependency_resolution --no_conda_auto_init"
+    fi
+    json=$(mktemp -u -p json_output --suff .json)
+    PIP_QUIET=1 planemo test $PLANEMO_OPTIONS --database_connection "$DATABASE_CONNECTION" --galaxy_source "$GALAXY_SOURCE" --galaxy_branch "$GALAXY_BRANCH" --galaxy_python_version "$PYTHON_VERSION" --test_output_json "$json" $TOOL_GROUP || true
+    docker system prune --all --force --volumes || true
+  done < tool_list_chunk.txt
+
+  if [ ! -s tool_list_chunk.txt ]; then
+    echo '{"tests":[]}' > "$(mktemp -u -p json_output --suff .json)"
   fi
-  if [ -s changed_tools_chunk.list ]; then
-      PIP_QUIET=1 planemo test --galaxy_python_version "$PYTHON_VERSION" --database_connection "$DATABASE_CONNECTION" $PLANEMO_OPTIONS --galaxy_source $GALAXY_REPO --galaxy_branch $GALAXY_RELEASE --test_output_json test_output.json $(cat changed_tools_chunk.list) || true
-      docker system prune --all --force --volumes || true
-  elif [ -s changed_repositories_chunk.list ]; then
-      while read -r DIR; do
-          if [[ "$DIR" =~ ^data_managers.* ]]; then
-              TESTPATH=$(planemo ci_find_tools "$DIR")
-          else
-              TESTPATH="$DIR"
-          fi
-          PIP_QUIET=1 planemo test --galaxy_python_version "$PYTHON_VERSION" --database_connection "$DATABASE_CONNECTION" $PLANEMO_OPTIONS --galaxy_source $GALAXY_REPO --galaxy_branch $GALAXY_RELEASE --test_output_json "$DIR"/test_output.json "$TESTPATH" || true
-          docker system prune --all --force --volumes || true
-      done < changed_repositories_chunk.list
-  else
-      echo '{"tests":[]}' > test_output.json
-  fi
+
+  planemo merge_test_reports json_output/*.json tool_test_output.json
+  planemo test_reports tool_test_output.json --test_output tool_test_output.html
+  
+  mkdir upload
+  mv tool_test_output.json tool_test_output.html upload/
 fi
 
 if [ "$PLANEMO_COMBINE_OUTPUTS" == "true" ]; then

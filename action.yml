@@ -70,9 +70,6 @@ outputs:
   tools:
     description: 'List of tools'
     value: ${{ steps.repositories.outputs.tools }}
-  nchunks:
-    description: 'Number of chunks to use'
-    value: ${{ steps.nchunks.outputs.nchunks }}
   chunk-list:
     description: 'Number of chunks to use'
     value: ${{ steps.chunk-list.outputs.chunk-list }}
@@ -96,7 +93,6 @@ runs:
         REPOSITORIES: ${{ inputs.repositories}}
         CHUNK: ${{ inputs.chunk }}
         CHUNK_COUNT: ${{ inputs.chunk-count}}
-        MAX_CHUNKS: ${{ inputs.max-chunks}}
         DATABASE_CONNECTION: ${{ inputs.database-connection }}
         PLANEMO_LINT_TOOLS: ${{ inputs.lint-tools }}
         PLANEMO_TEST_TOOLS: ${{ inputs.test-tools }}
@@ -123,8 +119,8 @@ runs:
         echo "::set-output name=tools::$TOOLS"
       id: tools
       shell: bash
-    - run: echo "::set-output name=nchunks::$(cat nchunks.txt)"
-      id: nchunks
+    - run: echo "::set-output name=chunk-count::$(cat chunk-count.txt)"
+      id: chunk-count
       shell: bash
     - run: echo "::set-output name=chunk-list::[$(seq -s ", " 0 $((${{ steps.nchunks.outputs.nchunks }} - 1)))]"
       id: chunk-list
