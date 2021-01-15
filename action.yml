@@ -64,6 +64,9 @@ outputs:
   repositories:
     description: 'List of repositories'
     value: ${{ steps.repositories.outputs.repositories }}
+  tools:
+    description: 'List of tools'
+    value: ${{ steps.repositories.outputs.tools }}
   nchunks:
     description: 'Number of chunks to use'
     value: ${{ steps.nchunks.outputs.nchunks }}
@@ -107,6 +110,14 @@ runs:
         REPOS="${REPOS//$'\n'/'%0A'}"
         REPOS="${REPOS//$'\r'/'%0D'}"
         echo "::set-output name=repositories::$REPOS"
+      id: repositories
+      shell: bash
+    - run: |
+        TOOLS=$(cat tool_list.txt)
+        TOOLS="${TOOLS//'%'/'%25'}"
+        TOOLS="${TOOLS//$'\n'/'%0A'}"
+        TOOLS="${TOOLS//$'\r'/'%0D'}"
+        echo "::set-output name=tools::$TOOLS"
       id: repositories
       shell: bash
     - run: echo "::set-output name=nchunks::$(cat nchunks.txt)"

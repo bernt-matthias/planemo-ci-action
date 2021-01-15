@@ -39,10 +39,13 @@ if [ "$REPOSITORIES" == "" ]; then
   planemo ci_find_repos $PLANEMO_COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output repository_list.txt
   REPOSITORIES=$(cat repository_list.txt)
 
-  touch tool_list.txt
-  if [ -s repository_list.txt ]; then
-    planemo ci_find_tools --output tool_list.txt $(cat repository_list.txt)
-  fi
+  # TODO check: run ci_find_tools on complete repo has the advantage that it can be reused in the linting step
+  planemo ci_find_tools $PLANEMO_COMMIT_RANGE} --exclude packages --exclude deprecated --exclude_from .tt_skip --output tool_list.txt
+  TOOLS=$(cat tool_list)
+  # touch tool_list.txt
+  # if [ -s repository_list.txt ]; then
+  #   planemo ci_find_tools --output tool_list.txt $(cat repository_list.txt)
+  # fi
 
   NCHUNKS=$(wc -l < tool_list.txt)
   if [ "$NCHUNKS" -gt "$MAX_CHUNKS" ]; then
@@ -52,10 +55,8 @@ if [ "$REPOSITORIES" == "" ]; then
   fi
   echo $NCHUNKS > nchunks.txt
 else
-  REPOSITORIES="${REPOSITORIES//'%'/'%25'}"
-  REPOSITORIES="${REPOSITORIES//$'\n'/'%0A'}"
-  REPOSITORIES="${REPOSITORIES//$'\r'/'%0D'}"
   echo "$REPOSITORIES" > repository_list.txt
+  echo "$TOOLS" > tool_list.txt
   echo "$COMMIT_RANGE" > commit_range.txt
   echo "$NCHUNKS" > nchunks.txt
 fi
@@ -64,6 +65,14 @@ if [ "$PLANEMO_LINT_TOOLS" == "true" ]; then
   while read -r DIR; do
     planemo shed_lint --tools --ensure_metadata --urls --report_level warn --fail_level error --recursive "$DIR";
   done < repository_list.txt
+  # Check if each changed tool is in the list of changed repositories
+  while read -r TOOL; do
+    # Check if any changed repo dir is a substring of $TOOL
+    if ! echo $TOOL | grep -qf ../workflow_artifacts/repository_list.txt; then
+      echo "Tool $TOOL not in changed repositories list: .shed.yml file missing" >&2
+      exit 1
+    fi
+  done < tool_list.txt
 fi
 
 if [ "$PLANEMO_TEST_TOOLS" == "true" ]; then
