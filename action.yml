@@ -120,7 +120,7 @@ runs:
         echo "::set-output name=tools::$TOOLS"
       id: tools
       shell: bash
-    - run: echo "::set-output name=chunk-count::$(cat chunk-count.txt)"
+    - run: echo "::set-output name=chunk-count::$(cat chunk_count.txt)"
       id: chunk-count
       shell: bash
     - run: echo "::set-output name=chunk-list::[$(seq -s ", " 0 $((${{ steps.nchunks.outputs.nchunks }} - 1)))]"
