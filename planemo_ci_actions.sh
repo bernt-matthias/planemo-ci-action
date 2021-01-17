@@ -50,7 +50,7 @@ if [ "$REPOSITORIES" == "" -a "$PLANEMO_LINT_TOOLS" != "true" -a "$PLANEMO_TEST_
   if [ ! -z $COMMIT_RANGE ]; then
     PLANEMO_COMMIT_RANGE="--changed_in_commit_range $COMMIT_RANGE"
   fi
-
+  planemo ci_find_repos --help
   planemo ci_find_repos $PLANEMO_COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output repository_list.txt
   REPOSITORIES=$(cat repository_list.txt)
 
