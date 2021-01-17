@@ -5,7 +5,7 @@ DEFAULT_BRANCH="release_20.09"
 DEFAULT_FORK="galaxyproject"
 
 mkdir upload
-touch repository_list.txt tool_list.txt chunk_count.txt commit_range.txt tool_test_output.json
+touch repository_list.txt tool_list.txt chunk_count.txt commit_range.txt upload/tool_test_output.json
 
 if [ "$GET_REPO" != "false" ]; then
   echo ${GALAXY_BRANCH:-$DEFAULT_BRANCH} > branch.txt
