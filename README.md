@@ -33,7 +33,7 @@ Optional inputs:
 
 - `create-cache` (default `false`)
 - `galaxy-branch` (default latest Galaxy release)
-- `galaxy-source` (default `https://github.com/galaxyproject/galaxy`)
+- `galaxy-source` (default `galaxyproject`)
 - `max-chunks` (default `20`)
 - `python-version` (default `"3.7"`)
 

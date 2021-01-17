@@ -1,10 +1,23 @@
 #!/usr/bin/env bash
 set -ex
 
+DEFAULT_BRANCH="release_20.09"
+DEFAULT_FORK="galaxyproject"
+
+if [ "$GET_REPO" != "false" ]; then
+  echo ${GALAXY_BRANCH:-$DEFAULT_BRANCH} > branch.txt
+  echo ${GALAXY_FORK:-$DEFAULT_FORK} > fork.txt
+  exit 0
+fi
+
+# Install the `wheel` package so that when installing other packages which
+# are not available as wheels, pip will build a wheel for them, which can be cached.
+pip install wheel $PLANEMO_VERSION
+
 if [ "$CREATE_CACHE" != "false" ]; then
   tmp_dir=$(mktemp -d)
   touch "$tmp_dir/tool.xml"
-  PIP_QUIET=1 planemo test --galaxy_python_version "$PYTHON_VERSION" --no_conda_auto_init --galaxy_source "$GALAXY_SOURCE" --galaxy_branch "$GALAXY_BRANCH" "$tmp_dir"
+  PIP_QUIET=1 planemo test --galaxy_python_version "$PYTHON_VERSION" --no_conda_auto_init --galaxy_source https://github.com/"$GALAXY_FORK"/galaxy --galaxy_branch "$GALAXY_BRANCH" "$tmp_dir"
 fi
 
 if [ "$REPOSITORIES" == "" -a "$PLANEMO_LINT_TOOLS" != "true" -a "$PLANEMO_TEST_TOOLS" != "true" -a "$PLANEMO_COMBINE_OUTPUTS" != "true" -a "$PLANEMO_CHECK_OUTPUTS" != "true" -a "$PLANEMO_DEPLOY" != "true" ]; then
@@ -98,7 +111,7 @@ if [ "$PLANEMO_TEST_TOOLS" == "true" ]; then
       PLANEMO_OPTIONS="--biocontainers --no_dependency_resolution --no_conda_auto_init"
     fi
     json=$(mktemp -u -p json_output --suff .json)
-    PIP_QUIET=1 planemo test $PLANEMO_OPTIONS --database_connection "$DATABASE_CONNECTION" --galaxy_source "$GALAXY_SOURCE" --galaxy_branch "$GALAXY_BRANCH" --galaxy_python_version "$PYTHON_VERSION" --test_output_json "$json" $TOOL_GROUP || true
+    PIP_QUIET=1 planemo test $PLANEMO_OPTIONS --database_connection "$DATABASE_CONNECTION" --galaxy_source https://github.com/"$GALAXY_FORK"/galaxy --galaxy_branch "$GALAXY_BRANCH" --galaxy_python_version "$PYTHON_VERSION" --test_output_json "$json" $TOOL_GROUP || true
     docker system prune --all --force --volumes || true
   done < tool_list_chunk.txt
 

@@ -10,16 +10,19 @@ inputs:
     default: 'planemo'
   galaxy-branch:
     description: 'Galaxy branch to use'
-    default: 'release_20.09'
-  galaxy-source:
-    description: 'Galaxy repository to use'
-    default: 'https://github.com/galaxyproject/galaxy'
+    default: ''
+  galaxy-fork:
+    description: 'Galaxy fork to use'
+    default: ''
   python-version:
     description: 'Python version to use'
     default: '3.7'
   repositories:
     description: 'List of repositories.'
     default: ''
+  get-repo:
+    description: Get repository and branch
+    default: false
   lint-tools:
     descriptions: 'Lint planemo tools?'
     default: false
@@ -82,14 +85,16 @@ outputs:
   statistics:
     description: "Statistics of combined repositories"
     value: ${{ steps.statistics.outputs.statistics }}
+  fork:
+    description: "Fork to use"
+    value: ${{ steps.get-repo.outputs.fork }}
+  branch:
+    description: "Branch to use"
+    value: ${{ steps.get-repo.outputs.branch }}
 
 runs:
   using: 'composite'
   steps:
-    # Install the `wheel` package so that when installing other packages which
-    # are not available as wheels, pip will build a wheel for them, which can be cached.
-    - run: pip install wheel ${{ inputs.planemo-version }}
-      shell: bash
     - name: Install jq
       run: sudo apt-get install jq
       shell: bash
@@ -100,7 +105,7 @@ runs:
         EVENT_BEFORE: ${{ github.event.before }}
         CREATE_CACHE: ${{ inputs.create-cache }}
         GALAXY_BRANCH: ${{ inputs.galaxy-branch }}
-        GALAXY_SOURCE: ${{ inputs.galaxy-source }}
+        GALAXY_FORK: ${{ inputs.galaxy-fork }}
         PYTHON_VERSION: ${{ inputs.python-version }}
         REPOSITORIES: ${{ inputs.repositories}}
         TOOLS: ${{ inputs.tools }}
@@ -117,6 +122,17 @@ runs:
         PLANEMO_MD_REPORT: ${{ inputs.markdown-report }}
         SHED_TARGET: ${{ inputs.shed-target }}
         SHED_KEY: ${{ inputs.shed-key }}
+        PLANEMO_VERSION: ${{ inputs.planemo-version }} 
+        GET_REPO: ${{ inputs.get-repo }} 
+
+    # outputs of the get-repo mode
+    - run: |
+        echo "::set-output name=fork::$(cat fork.txt)"
+        echo "::set-output name=branch::$(cat branch.txt)"
+      id: get-repo
+      shell: bash
+
+    # TODO combine outputs by mode
     # see https://trstringer.com/github-actions-multiline-strings/
     - run: |
         REPOS=$(cat repository_list.txt)
