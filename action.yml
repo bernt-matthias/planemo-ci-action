@@ -91,8 +91,8 @@ runs:
     - run: pip install wheel ${{ inputs.planemo-version }}
       shell: bash
     - name: Install jq
-      if: ${{ inputs.combine-outputs == true }}
       run: sudo apt-get install jq
+      shell: bash
     - name: run planemo actions
       run: ${{ github.action_path }}/planemo_ci_actions.sh
       shell: bash
@@ -145,6 +145,5 @@ runs:
       shell: bash
     - name: Create statistics
       id: statistics
-      if: ${{ inputs.combine-outputs }}
       run: echo ::set-output name=statistics::$(jq '.["tests"][]["data"]["status"]' upload/tool_test_output.json | sed 's/"//g' | sort | uniq -c) 
       shell: bash
