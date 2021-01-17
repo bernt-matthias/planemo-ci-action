@@ -14,6 +14,9 @@ boolean inputs:
 
 If none of these inputs is set then a setup mode runs.
 
+In all modes required software will be installed automatically, i.e. `planemo` and `jq`. 
+The version of planemo can be controlled with the input `planemo-version` (default `"planemo"`).
+
 Setup mode
 ----------
 
