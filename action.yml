@@ -79,6 +79,9 @@ outputs:
   chunk-list:
     description: "List of chunks"
     value: ${{ steps.chunk-list.outputs.chunk-list }}
+  statistics:
+    description: "Statistics of combined repositories"
+    value: ${{ steps.statistics.outputs.statistics }}
 
 runs:
   using: 'composite'
@@ -140,3 +143,6 @@ runs:
     - run: echo "::set-output name=commit-range::$(cat commit_range.txt)"
       id: commit-range
       shell: bash
+    - run: echo ::set-output name=statistics::$(jq '.["tests"][]["data"]["status"]' upload/tool_test_output.json | sed 's/"//g' | sort | uniq -c) 
+      id: statistics
+      if: ${{ inputs.combine-outputs }}
