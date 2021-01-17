@@ -122,7 +122,7 @@ runs:
         PLANEMO_MD_REPORT: ${{ inputs.markdown-report }}
         SHED_TARGET: ${{ inputs.shed-target }}
         SHED_KEY: ${{ inputs.shed-key }}
-        PLANEMO_VERSION: ${{ inputs.planemo-version }} 
+        PIP_PLANEMO_VERSION: ${{ inputs.planemo-version }} 
         GET_REPO: ${{ inputs.get-repo }} 
 
     # outputs of the get-repo mode

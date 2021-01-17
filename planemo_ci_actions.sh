@@ -15,7 +15,7 @@ fi
 
 # Install the `wheel` package so that when installing other packages which
 # are not available as wheels, pip will build a wheel for them, which can be cached.
-pip install wheel $PLANEMO_VERSION
+pip install wheel $PIP_PLANEMO_VERSION
 
 if [ "$CREATE_CACHE" != "false" ]; then
   tmp_dir=$(mktemp -d)
