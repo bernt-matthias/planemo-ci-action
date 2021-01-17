@@ -118,7 +118,10 @@ if [ "$PLANEMO_COMBINE_OUTPUTS" == "true" ]; then
   find artifacts/ -name tool_test_output.json -exec sh -c 'planemo merge_test_reports "$@" upload/tool_test_output.json' sh {} +
   [ "$PLANEMO_HTML_REPORT" == "true" ] && planemo test_reports upload/test_output.json --test_output upload/test_output.html
   [ "$PLANEMO_MD_REPORT" == "true" ] && planemo test_reports upload/test_output.json --test_output_markdown upload/test_output.md
+fi
 
+
+if [ "$PLANEMO_CHECK_OUTPUTS" == "true" ]; then
   if jq '.["tests"][]["data"]["status"]' upload/tool_test_output.json | grep -v "success"; then
     echo "Unsuccessful tests found, inspect the 'All tool test results' artifact for details."
     exit 1

@@ -44,6 +44,9 @@ inputs:
   combine-outputs:
     descripttion: 'Combine multiple test reports into a single output'
     default: false
+  check-outputs:
+    descripttion: 'Check test report for errors'
+    default: false
   html-report:
     description: 'Create HTML report?'
     default: false
@@ -84,6 +87,9 @@ runs:
     # are not available as wheels, pip will build a wheel for them, which can be cached.
     - run: pip install wheel ${{ inputs.planemo-version }}
       shell: bash
+    - name: Install jq
+      if: ${{ inputs.combine-outputs == true }}
+      run: sudo apt-get install jq
     - name: run planemo actions
       run: ${{ github.action_path }}/planemo_ci_actions.sh
       shell: bash
@@ -103,6 +109,7 @@ runs:
         PLANEMO_TEST_TOOLS: ${{ inputs.test-tools }}
         PLANEMO_DEPLOY_TOOLS: ${{ inputs.deploy-tools }}
         PLANEMO_COMBINE_OUTPUTS: ${{ inputs.combine-outputs }}
+        PLANEMO_CHECK_OUTPUTS: ${{ inputs.check-outputs }}
         PLANEMO_HTML_REPORT: ${{ inputs.html-report }}
         PLANEMO_MD_REPORT: ${{ inputs.markdown-report }}
         SHED_TARGET: ${{ inputs.shed-target }}
