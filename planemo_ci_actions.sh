@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 set -ex
 
-DEFAULT_BRANCH="release_20.09"
-DEFAULT_FORK="galaxyproject"
-
 mkdir upload
 touch repository_list.txt tool_list.txt chunk_count.txt commit_range.txt upload/tool_test_output.json
 
 if [ "$GET_REPO" != "false" ]; then
-  echo ${GALAXY_BRANCH:-$DEFAULT_BRANCH} > branch.txt
-  echo ${GALAXY_FORK:-$DEFAULT_FORK} > fork.txt
+  FORK=${GALAXY_FORK:-"galaxyproject"}
+  echo $FORK > fork.txt
+
+  echo ${GALAXY_BRANCH:-$(git ls-remote https://github.com/$FORK/galaxy | grep "refs/heads/release_" | tail -n 1 | cut -d"/" -f3)} > branch.txt
   exit 0
 fi
 
@@ -50,10 +49,6 @@ if [ "$REPOSITORIES" == "" -a "$PLANEMO_LINT_TOOLS" != "true" -a "$PLANEMO_TEST_
   if [ ! -z $COMMIT_RANGE ]; then
     PLANEMO_COMMIT_RANGE="--changed_in_commit_range $COMMIT_RANGE"
   fi
-  
-  planemo --help
-  
-  planemo ci_find_repos --help
   
   planemo ci_find_repos $PLANEMO_COMMIT_RANGE --exclude packages --exclude deprecated --exclude_from .tt_skip --output repository_list.txt
   REPOSITORIES=$(cat repository_list.txt)
