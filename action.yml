@@ -143,6 +143,8 @@ runs:
     - run: echo "::set-output name=commit-range::$(cat commit_range.txt)"
       id: commit-range
       shell: bash
-    - run: echo ::set-output name=statistics::$(jq '.["tests"][]["data"]["status"]' upload/tool_test_output.json | sed 's/"//g' | sort | uniq -c) 
+    - name: Create statistics
       id: statistics
       if: ${{ inputs.combine-outputs }}
+      run: echo ::set-output name=statistics::$(jq '.["tests"][]["data"]["status"]' upload/tool_test_output.json | sed 's/"//g' | sort | uniq -c) 
+      shell: bash
