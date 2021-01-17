@@ -7,7 +7,7 @@ if [ "$CREATE_CACHE" != "false" ]; then
   PIP_QUIET=1 planemo test --galaxy_python_version "$PYTHON_VERSION" --no_conda_auto_init --galaxy_source "$GALAXY_SOURCE" --galaxy_branch "$GALAXY_BRANCH" "$tmp_dir"
 fi
 
-if [ "$REPOSITORIES" == "" ]; then
+if [ "$REPOSITORIES" == "" -a "$PLANEMO_LINT_TOOLS" != "true" -a "$PLANEMO_TEST_TOOLS" != "true" -a "$PLANEMO_COMBINE_OUTPUTS" != "true" -a "$PLANEMO_CHECK_OUTPUTS" != "true" -a "$PLANEMO_DEPLOY" == "true" ]; then
   # The range of commits to check for changes is:
   # - `origin/master...` for all events happening on a feature branch
   # - for events on the master branch we compare against the sha before the event

@@ -10,7 +10,7 @@ inputs:
     default: 'planemo'
   galaxy-branch:
     description: 'Galaxy branch to use'
-    default: 'master'
+    default: 'release_20.09'
   galaxy-source:
     description: 'Galaxy repository to use'
     default: 'https://github.com/galaxyproject/galaxy'
