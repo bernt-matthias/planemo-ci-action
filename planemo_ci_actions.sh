@@ -4,6 +4,9 @@ set -ex
 DEFAULT_BRANCH="release_20.09"
 DEFAULT_FORK="galaxyproject"
 
+mkdir upload
+touch repository_list.txt tool_list.txt chunk_count.txt commit_range.txt tool_test_output.json
+
 if [ "$GET_REPO" != "false" ]; then
   echo ${GALAXY_BRANCH:-$DEFAULT_BRANCH} > branch.txt
   echo ${GALAXY_FORK:-$DEFAULT_FORK} > fork.txt
@@ -122,12 +125,10 @@ if [ "$PLANEMO_TEST_TOOLS" == "true" ]; then
   planemo merge_test_reports json_output/*.json tool_test_output.json
   planemo test_reports tool_test_output.json --test_output tool_test_output.html
   
-  mkdir upload
   mv tool_test_output.json tool_test_output.html upload/
 fi
 
 if [ "$PLANEMO_COMBINE_OUTPUTS" == "true" ]; then
-  mkdir upload
   find artifacts/ -name tool_test_output.json -exec sh -c 'planemo merge_test_reports "$@" upload/tool_test_output.json' sh {} +
   [ "$PLANEMO_HTML_REPORT" == "true" ] && planemo test_reports upload/test_output.json --test_output upload/test_output.html
   [ "$PLANEMO_MD_REPORT" == "true" ] && planemo test_reports upload/test_output.json --test_output_markdown upload/test_output.md
