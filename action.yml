@@ -127,7 +127,7 @@ runs:
     - run: echo "::set-output name=chunk-count::$(cat chunk_count.txt)"
       id: chunk-count
       shell: bash
-    - run: echo "::set-output name=chunk-list::[$(seq -s ", " 0 $((${{ steps.nchunks.outputs.nchunks }} - 1)))]"
+    - run: echo "::set-output name=chunk-list::[$(seq -s ", " 0 $((${{ steps.nchunks.outputs.chunk-count }} - 1)))]"
       id: chunk-list
       shell: bash
     - run: echo "::set-output name=commit-range::$(cat commit_range.txt)"

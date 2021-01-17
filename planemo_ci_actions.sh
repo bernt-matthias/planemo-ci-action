@@ -114,11 +114,15 @@ if [ "$PLANEMO_TEST_TOOLS" == "true" ]; then
 fi
 
 if [ "$PLANEMO_COMBINE_OUTPUTS" == "true" ]; then
-  find . -name test_output.json -exec sh -c 'planemo merge_test_reports "$@" test_output.json' sh {} +
-  [ ! -d upload ] && mkdir upload
-  mv test_output.json upload/
+  mkdir upload
+  find artifacts/ -name tool_test_output.json -exec sh -c 'planemo merge_test_reports "$@" upload/tool_test_output.json' sh {} +
   [ "$PLANEMO_HTML_REPORT" == "true" ] && planemo test_reports upload/test_output.json --test_output upload/test_output.html
   [ "$PLANEMO_MD_REPORT" == "true" ] && planemo test_reports upload/test_output.json --test_output_markdown upload/test_output.md
+
+  if jq '.["tests"][]["data"]["status"]' upload/tool_test_output.json | grep -v "success"; then
+    echo "Unsuccessful tests found, inspect the 'All tool test results' artifact for details."
+    exit 1
+  fi
 fi
 
 if [ "$PLANEMO_DEPLOY" == "true" ]; then
