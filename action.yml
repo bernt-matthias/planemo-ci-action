@@ -151,5 +151,5 @@ runs:
       shell: bash
     - name: Create statistics
       id: statistics
-      run: echo ::set-output name=statistics::$(statistics.txt) 
+      run: echo ::set-output name=statistics::$(cat statistics.txt) 
       shell: bash
