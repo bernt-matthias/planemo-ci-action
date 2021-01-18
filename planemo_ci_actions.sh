@@ -129,15 +129,9 @@ if [ "$PLANEMO_TEST_TOOLS" == "true" ]; then
 fi
 
 if [ "$PLANEMO_COMBINE_OUTPUTS" == "true" ]; then
-  ls -Rla artifacts/
-
-  find -D exec artifacts/ -name tool_test_output.json -exec sh -c 'cat "$@"' sh {} +
-  
-  find -D exec artifacts/ -name tool_test_output.json -exec sh -c 'echo "$@"' sh {} +
+  find -D exec artifacts/ -name tool_test_output.json -exec sh -c 'exit 1' sh {} +
 
   find -D exec artifacts/ -name tool_test_output.json -exec sh -c 'planemo merge_test_reports "$@" upload/tool_test_output.json' sh {} +
-
-  cat upload/tool_test_output.json
 
   [ "$PLANEMO_HTML_REPORT" == "true" ] && planemo test_reports upload/tool_test_output.json --test_output upload/tool_test_output.html
   [ "$PLANEMO_MD_REPORT" == "true" ] && planemo test_reports upload/tool_test_output.json --test_output_markdown upload/tool_test_output.md
