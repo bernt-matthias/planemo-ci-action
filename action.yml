@@ -75,10 +75,10 @@ outputs:
     value: ${{ steps.setup.outputs.tools }}
   chunk-count:
     description: 'Number of chunks to use'
-    value: ${{ steps.setup.outputs.chunk-count }}
+    value: ${{ steps.chunk-count.outputs.chunk-count }}
   chunk-list:
     description: "List of chunks"
-    value: ${{ steps.setup.outputs.chunk-list }}
+    value: ${{ steps.chunk-list.outputs.chunk-list }}
   statistics:
     description: "Statistics of combined repositories"
     value: ${{ steps.statistics.outputs.statistics }}
@@ -126,17 +126,24 @@ runs:
         REPOS="${REPOS//$'\n'/'%0A'}"
         REPOS="${REPOS//$'\r'/'%0D'}"
         echo "::set-output name=repositories::$REPOS"
-
+      id: repositories
+      shell: bash
+    - run: |
         TOOLS=$(cat tool_list.txt)
         TOOLS="${TOOLS//'%'/'%25'}"
         TOOLS="${TOOLS//$'\n'/'%0A'}"
         TOOLS="${TOOLS//$'\r'/'%0D'}"
         echo "::set-output name=tools::$TOOLS"
-
-        echo "::set-output name=chunk-count::$(cat chunk_count.txt)"
-        echo "::set-output name=chunk-list::[$(seq -s ", " 0 $((${{ steps.chunk-count.outputs.chunk-count }} - 1)))]"
-        echo "::set-output name=commit-range::$(cat commit_range.txt)"
-      id: setup
+      id: tools
+      shell: bash
+    - run: echo "::set-output name=commit-range::$(cat commit_range.txt)"
+      id: commit-range
+      shell: bash
+    - run: echo "::set-output name=chunk-count::$(cat chunk_count.txt)"
+      id: chunk-count
+      shell: bash
+    - run: echo "::set-output name=chunk-list::[$(seq -s ", " 0 $((${{ steps.chunk-count.outputs.chunk-count }} - 1)))]"
+      id: chunk-count
       shell: bash
     - run: echo ::set-output name=statistics::$(cat statistics.txt)
       id: statistics
