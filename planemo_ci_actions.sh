@@ -2,7 +2,7 @@
 set -ex
 
 mkdir -p upload
-touch repository_list.txt tool_list.txt chunk_count.txt commit_range.txt upload/tool_test_output.json fork.txt branch.txt
+touch repository_list.txt tool_list.txt chunk_count.txt commit_range.txt statistics.txt fork.txt branch.txt
 
 if [ "$GET_REPO" != "false" ]; then
   FORK=${GALAXY_FORK:-"galaxyproject"}
@@ -125,6 +125,7 @@ if [ "$PLANEMO_TEST_TOOLS" == "true" ]; then
   planemo test_reports tool_test_output.json --test_output tool_test_output.html
   
   mv tool_test_output.json tool_test_output.html upload/
+  cat upload/tool_test_output.json
 fi
 
 if [ "$PLANEMO_COMBINE_OUTPUTS" == "true" ]; then
@@ -140,8 +141,6 @@ if [ "$PLANEMO_COMBINE_OUTPUTS" == "true" ]; then
 
   [ "$PLANEMO_HTML_REPORT" == "true" ] && planemo test_reports upload/tool_test_output.json --test_output upload/tool_test_output.html
   [ "$PLANEMO_MD_REPORT" == "true" ] && planemo test_reports upload/tool_test_output.json --test_output_markdown upload/tool_test_output.md
-else
-  echo '{"tests":[]}' > upload/tool_test_output.json
 fi
 
 if [ "$PLANEMO_CHECK_OUTPUTS" == "true" ]; then
