@@ -26,7 +26,7 @@ latest release of the main repository. The optional inputs overwrite these defau
 
 Optional inputs
 
-- `galaxy-branch`:
+- `galaxy-branch`
 - `galaxy-fork`
 
 Outputs:

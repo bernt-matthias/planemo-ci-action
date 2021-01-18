@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-mkdir upload
+mkdir -p upload
 touch repository_list.txt tool_list.txt chunk_count.txt commit_range.txt upload/tool_test_output.json
 
 if [ "$GET_REPO" != "false" ]; then
