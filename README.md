@@ -18,23 +18,6 @@ If none of these inputs is set then a setup mode runs.
 In all modes required software will be installed automatically, i.e. `planemo` and `jq`. 
 The version of planemo can be controlled with the input `planemo-version` (default `"planemo"`).
 
-Get repository mode
--------------------
-
-Determine the fork and brnach of Galaxy to use for testing tools. By default this is the 
-latest release of the main repository. The optional inputs overwrite these defaults.
-
-Optional inputs
-
-- `galaxy-branch`
-- `galaxy-fork`
-
-Outputs:
-
-- `branch`: branch to use
-- `fork`: fork to use
-
-
 Setup mode
 ----------
 

@@ -20,9 +20,6 @@ inputs:
   repositories:
     description: 'List of repositories.'
     default: ''
-  get-repo:
-    description: Get repository and branch
-    default: false
   lint-tools:
     descriptions: 'Lint planemo tools?'
     default: false
@@ -125,13 +122,6 @@ runs:
         PIP_PLANEMO_VERSION: ${{ inputs.planemo-version }} 
         GET_REPO: ${{ inputs.get-repo }} 
 
-    # outputs of the get-repo mode
-    - run: |
-        echo "::set-output name=fork::$(cat fork.txt)"
-        echo "::set-output name=branch::$(cat branch.txt)"
-      id: get-repo
-      shell: bash
-
     # TODO combine outputs by mode
     # see https://trstringer.com/github-actions-multiline-strings/
     - run: |
@@ -161,5 +151,5 @@ runs:
       shell: bash
     - name: Create statistics
       id: statistics
-      run: echo ::set-output name=statistics::$(jq '.["tests"][]["data"]["status"]' upload/tool_test_output.json | sed 's/"//g' | sort | uniq -c) 
+      run: echo ::set-output name=statistics::$(statistics.txt) 
       shell: bash

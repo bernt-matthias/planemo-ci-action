@@ -1,16 +1,9 @@
 #!/usr/bin/env bash
 set -ex
 
+# ensure that all files that are used for action outputs are present 
 mkdir -p upload
-touch repository_list.txt tool_list.txt chunk_count.txt commit_range.txt statistics.txt fork.txt branch.txt
-
-if [ "$GET_REPO" != "false" ]; then
-  FORK=${GALAXY_FORK:-"galaxyproject"}
-  echo $FORK > fork.txt
-
-  echo ${GALAXY_BRANCH:-$(git ls-remote https://github.com/$FORK/galaxy | grep "refs/heads/release_" | tail -n 1 | cut -d"/" -f3)} > branch.txt
-  exit 0
-fi
+touch repository_list.txt tool_list.txt chunk_count.txt commit_range.txt statistics.txt 
 
 # Install the `wheel` package so that when installing other packages which
 # are not available as wheels, pip will build a wheel for them, which can be cached.
@@ -129,15 +122,17 @@ if [ "$PLANEMO_TEST_TOOLS" == "true" ]; then
 fi
 
 if [ "$PLANEMO_COMBINE_OUTPUTS" == "true" ]; then
-  find -D exec artifacts/ -name tool_test_output.json -exec sh -c 'exit 1' sh {} +
-
+  # combine test reports in artifacts into a single one (upload/tool_test_output.json)
   find -D exec artifacts/ -name tool_test_output.json -exec sh -c 'planemo merge_test_reports "$@" upload/tool_test_output.json' sh {} +
-
+  # create html and markdown reports
   [ "$PLANEMO_HTML_REPORT" == "true" ] && planemo test_reports upload/tool_test_output.json --test_output upload/tool_test_output.html
   [ "$PLANEMO_MD_REPORT" == "true" ] && planemo test_reports upload/tool_test_output.json --test_output_markdown upload/tool_test_output.md
+  # get statistics
+  jq '.["tests"][]["data"]["status"]' upload/tool_test_output.json | sed 's/"//g' | sort | uniq -c > statistics.txt
 fi
 
 if [ "$PLANEMO_CHECK_OUTPUTS" == "true" ]; then
+
   if jq '.["tests"][]["data"]["status"]' upload/tool_test_output.json | grep -v "success"; then
     echo "Unsuccessful tests found, inspect the 'All tool test results' artifact for details."
     exit 1
