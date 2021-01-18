@@ -66,13 +66,13 @@ inputs:
 outputs:
   commit-range:
     description: 'Commit range'
-    value: ${{ steps.setup.outputs.commit-range }}
+    value: ${{ steps.commit-range.outputs.commit-range }}
   repositories:
     description: 'List of repositories'
-    value: ${{ steps.setup.outputs.repositories }}
+    value: ${{ steps.repositories.outputs.repositories }}
   tools:
     description: 'List of tools'
-    value: ${{ steps.setup.outputs.tools }}
+    value: ${{ steps.tools.outputs.tools }}
   chunk-count:
     description: 'Number of chunks to use'
     value: ${{ steps.chunk-count.outputs.chunk-count }}
@@ -143,7 +143,7 @@ runs:
       id: chunk-count
       shell: bash
     - run: echo "::set-output name=chunk-list::[$(seq -s ", " 0 $((${{ steps.chunk-count.outputs.chunk-count }} - 1)))]"
-      id: chunk-count
+      id: chunk-list
       shell: bash
     - run: echo ::set-output name=statistics::$(cat statistics.txt)
       id: statistics
