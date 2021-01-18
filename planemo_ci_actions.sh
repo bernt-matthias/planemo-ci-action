@@ -2,7 +2,7 @@
 set -ex
 
 mkdir -p upload
-touch repository_list.txt tool_list.txt chunk_count.txt commit_range.txt upload/tool_test_output.json
+touch repository_list.txt tool_list.txt chunk_count.txt commit_range.txt upload/tool_test_output.json fork.txt branch.txt
 
 if [ "$GET_REPO" != "false" ]; then
   FORK=${GALAXY_FORK:-"galaxyproject"}
