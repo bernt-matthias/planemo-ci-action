@@ -5,10 +5,6 @@ set -ex
 mkdir -p upload
 touch repository_list.txt tool_list.txt chunk_count.txt commit_range.txt statistics.txt 
 
-# Install the `wheel` package so that when installing other packages which
-# are not available as wheels, pip will build a wheel for them, which can be cached.
-pip install wheel $PIP_PLANEMO_VERSION
-
 if [ "$CREATE_CACHE" != "false" ]; then
   tmp_dir=$(mktemp -d)
   touch "$tmp_dir/tool.xml"
@@ -27,7 +23,7 @@ if [ "$REPOSITORIES" == "" -a "$PLANEMO_LINT_TOOLS" != "true" -a "$PLANEMO_TEST_
   if [ "$GITHUB_EVENT_NAME" =  "push" ]; then
     case "$GITHUB_REF" in
       refs/heads/master|refs/heads/main )
-      TODO RESTORE COMMIT_RANGE="$EVENT_BEFORE.."
+      COMMIT_RANGE="$EVENT_BEFORE.."
       ;;
       *)
       git fetch origin master
@@ -95,6 +91,9 @@ if [ "$PLANEMO_TEST_TOOLS" == "true" ]; then
 
   # show tools
   cat tool_list_chunk.txt
+
+  # TODO REMOVE
+  head -n 1 tool_list_chunk.txt > t && mv t tool_list_chunk.txt 
   
   # Test tools
   mkdir json_output

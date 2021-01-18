@@ -6,7 +6,6 @@ Installs planemo and discovers changed workflows and tools to test.
 The action runs in one of six modes which are controled with the following
 boolean inputs:
 
-- `get-repo`: Determine Galaxy branch and fork to use
 - `lint-tools`: Lint tools with `planemo shed_lint` and check presence of repository metadata files (`.shed.yml`).
 - `test-tools`: Test tools with `planemo test`.
 - `combine-outputs`: Combine the outputs from individual tool tests (`planemo merge_test_reports`) and create html/markdown reports (`planemo test_reports`).
@@ -17,6 +16,20 @@ If none of these inputs is set then a setup mode runs.
 
 In all modes required software will be installed automatically, i.e. `planemo` and `jq`. 
 The version of planemo can be controlled with the input `planemo-version` (default `"planemo"`).
+
+Assumptions on the repository
+-----------------------------
+
+Two files `.tt_skip` and `.tt_biocontainer_skip` must be present. They may contain path (or prefixes of paths). 
+Tools in a path that has a prefix in:
+
+
+- `.tt_skip` are ignored in all modes
+- `.tt_biocontainer_skip` are not tested using containers but conda is used for resolving requirements.
+
+Tools and tool repositories are discovered in all directories, except for `packages/` and `deprecated/`. These directories may be absent.
+
+
 
 Setup mode
 ----------

@@ -66,32 +66,31 @@ inputs:
 outputs:
   commit-range:
     description: 'Commit range'
-    value: ${{ steps.commit-range.outputs.commit-range }}
+    value: ${{ steps.setup.outputs.commit-range }}
   repositories:
     description: 'List of repositories'
-    value: ${{ steps.repositories.outputs.repositories }}
+    value: ${{ steps.setup.outputs.repositories }}
   tools:
     description: 'List of tools'
-    value: ${{ steps.tools.outputs.tools }}
+    value: ${{ steps.setup.outputs.tools }}
   chunk-count:
     description: 'Number of chunks to use'
-    value: ${{ steps.chunk-count.outputs.chunk-count }}
+    value: ${{ steps.setup.outputs.chunk-count }}
   chunk-list:
     description: "List of chunks"
-    value: ${{ steps.chunk-list.outputs.chunk-list }}
+    value: ${{ steps.setup.outputs.chunk-list }}
   statistics:
     description: "Statistics of combined repositories"
     value: ${{ steps.statistics.outputs.statistics }}
-  fork:
-    description: "Fork to use"
-    value: ${{ steps.get-repo.outputs.fork }}
-  branch:
-    description: "Branch to use"
-    value: ${{ steps.get-repo.outputs.branch }}
 
 runs:
   using: 'composite'
   steps:
+    # Install the `wheel` package so that when installing other packages which
+    # are not available as wheels, pip will build a wheel for them, which can be cached.
+    - name: Install planemo
+      run: pip install wheel ${{ inputs.planemo-version }}
+      shell: bash
     - name: Install jq
       run: sudo apt-get install jq
       shell: bash
@@ -119,10 +118,7 @@ runs:
         PLANEMO_MD_REPORT: ${{ inputs.markdown-report }}
         SHED_TARGET: ${{ inputs.shed-target }}
         SHED_KEY: ${{ inputs.shed-key }}
-        PIP_PLANEMO_VERSION: ${{ inputs.planemo-version }} 
-        GET_REPO: ${{ inputs.get-repo }} 
 
-    # TODO combine outputs by mode
     # see https://trstringer.com/github-actions-multiline-strings/
     - run: |
         REPOS=$(cat repository_list.txt)
@@ -130,26 +126,18 @@ runs:
         REPOS="${REPOS//$'\n'/'%0A'}"
         REPOS="${REPOS//$'\r'/'%0D'}"
         echo "::set-output name=repositories::$REPOS"
-      id: repositories
-      shell: bash
-    - run: |
+
         TOOLS=$(cat tool_list.txt)
         TOOLS="${TOOLS//'%'/'%25'}"
         TOOLS="${TOOLS//$'\n'/'%0A'}"
         TOOLS="${TOOLS//$'\r'/'%0D'}"
         echo "::set-output name=tools::$TOOLS"
-      id: tools
+
+        echo "::set-output name=chunk-count::$(cat chunk_count.txt)"
+        echo "::set-output name=chunk-list::[$(seq -s ", " 0 $((${{ steps.chunk-count.outputs.chunk-count }} - 1)))]"
+        echo "::set-output name=commit-range::$(cat commit_range.txt)"
+      id: setup
       shell: bash
-    - run: echo "::set-output name=chunk-count::$(cat chunk_count.txt)"
-      id: chunk-count
-      shell: bash
-    - run: echo "::set-output name=chunk-list::[$(seq -s ", " 0 $((${{ steps.chunk-count.outputs.chunk-count }} - 1)))]"
-      id: chunk-list
-      shell: bash
-    - run: echo "::set-output name=commit-range::$(cat commit_range.txt)"
-      id: commit-range
-      shell: bash
-    - name: Create statistics
+    - run: echo ::set-output name=statistics::$(cat statistics.txt)
       id: statistics
-      run: echo ::set-output name=statistics::$(cat statistics.txt) 
       shell: bash
