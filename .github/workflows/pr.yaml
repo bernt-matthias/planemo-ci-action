@@ -16,33 +16,17 @@ jobs:
     - name: Run ShellCheck
       uses: ludeeus/action-shellcheck@master
   
-  
-  setup:
-    name: Setup cache and determine changed repositories
+  lint:
+    name: Test linting
     runs-on: ubuntu-latest
-    outputs:
-      galaxy-head-sha: ${{ steps.get-galaxy-sha.outputs.galaxy-head-sha }}
-      repository-list: ${{ steps.discover.outputs.repository-list }}
-      tool-list: ${{ steps.discover.outputs.tool-list }}
-      chunk-count: ${{ steps.discover.outputs.chunk-count }}
-      chunk-list: ${{ steps.discover.outputs.chunk-list }}
     strategy:
       matrix:
-        python-version: [3.7]
-        test-type: [('tools', false), ('workflows', true)]
+        python: [3.7]
+
     steps:
-    - name: Print github context properties
-      run: |
-        echo 'event: ${{ github.event_name }}'
-        echo 'sha: ${{ github.sha }}'
-        echo 'ref: ${{ github.ref }}'
-        echo 'head_ref: ${{ github.head_ref }}'
-        echo 'base_ref: ${{ github.base_ref }}'
-        echo 'event.before: ${{ github.event.before }}'
-        echo 'event.after: ${{ github.event.after }}'
-    - name: Determine latest commit in the Galaxy repo
-      id: get-galaxy-sha
-      run: echo "::set-output name=galaxy-head-sha::$(git ls-remote https://github.com/${{ env.GALAXY_FORK }}/galaxy refs/heads/${{ env.GALAXY_BRANCH }} | cut -f1)"
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
     - uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
@@ -51,39 +35,19 @@ jobs:
       id: cache-pip
       with:
         path: ~/.cache/pip
-        key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ steps.get-galaxy-sha.outputs.galaxy-head-sha }}
-    - name: Cache .planemo
-      uses: actions/cache@v2
-      id: cache-planemo
-      with:
-        path: ~/.planemo
-        key: planemo_cache_py_${{ matrix.python-version }}_gxy_${{ steps.get-galaxy-sha.outputs.galaxy-head-sha }}
-    # Install the `wheel` package so that when installing other packages which
-    # are not available as wheels, pip will build a wheel for them, which can be cached.
-    - name: Install wheel
-      run: pip install wheel
-    - name: Install flake8
-      run: pip install flake8 flake8-import-order
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: Fake a Planemo run to update cache and determine commit range, repositories, and chunks
+        key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup.outputs.galaxy-head-sha }}
+
+    - name: Planemo lint tools
       uses: galaxyproject/planemo-ci-action@master
-      id: discover
       with:
-        create-cache: ${{ steps.cache-pip.outputs.cache-hit != 'true' || steps.cache-planemo.outputs.cache-hit != 'true' }}
-        galaxy-fork: ${{ env.GALAXY_FORK }}
-        galaxy-branch: ${{ env.GALAXY_BRANCH }}
-        max-chunks: ${{ env.MAX_CHUNKS }}
-        python-version: ${{ matrix.python-version }}
-        workflows: ${{ matrix.test-type[1] }}
-        base-dir: test/${{ matrix.test-type[0] }}
-    - name: Show commit range
-      run: echo ${{ steps.discover.outputs.commit-range }}
-    - name: Show repository list
-      run: echo "${{ steps.discover.outputs.repository-list }}"
-    - name: Show tool list
-      run: echo "${{ steps.discover.outputs.tool-list }}"
-    - name: Show chunks
-      run: |
-        echo 'Using ${{ steps.discover.outputs.chunk-count }} chunks (${{ steps.discover.outputs.chunk-list }})'
+        lint-mode: true
+        repository-list: "test/tools/tool1%0D%0Atest/tools/tool2"
+        tool-list: "test/tools/tool1/tool1.xml%0D%0Atest/tools/tool2/tool2.xml" 
+
+    - name: Planemo lint workflows
+      uses: galaxyproject/planemo-ci-action@master
+      with:
+        lint-mode: true
+        workflows: true
+        repository-list: "test/tools/example3/"
+        tool-list: "IGNORED AT THE MOMENT"
