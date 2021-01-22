@@ -9,7 +9,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run ShellCheck
-      uses: ludeeus/action-shellcheck@masteron: [push, pull_request]
+      uses: ludeeus/action-shellcheck@master
 env:
   GALAXY_FORK: galaxyproject
   GALAXY_BRANCH: master
