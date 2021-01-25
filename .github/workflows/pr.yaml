@@ -39,6 +39,8 @@ jobs:
 
     - name: Install wheel
       run: pip install wheel
+    - name: Install Planemo and flake8
+      run: pip install planemo flake8 flake8-import-order
     - name: Planemo lint tools
       # TODO uses: ./
       uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
