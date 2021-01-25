@@ -37,6 +37,8 @@ jobs:
         path: ~/.cache/pip
         key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup.outputs.galaxy-head-sha }}
 
+    - name: Install wheel
+      run: pip install wheel
     - name: Planemo lint tools
       # TODO uses: ./
       uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
