@@ -38,14 +38,16 @@ jobs:
         key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup.outputs.galaxy-head-sha }}
 
     - name: Planemo lint tools
-      uses: ./
+      # TODO uses: ./
+      uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
       with:
         lint-mode: true
         repository-list: "test/tools/tool1%0D%0Atest/tools/tool2"
         tool-list: "test/tools/tool1/tool1.xml%0D%0Atest/tools/tool2/tool2.xml" 
 
     - name: Planemo lint workflows
-      uses: ./
+      # TODO uses: ./
+      uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
       with:
         lint-mode: true
         workflows: true
