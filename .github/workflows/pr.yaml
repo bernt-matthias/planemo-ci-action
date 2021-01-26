@@ -71,6 +71,7 @@ jobs:
         echo "" >> test/tools/tool2/tool2.xml
         git commit -m bump test/tools/tool1/tool1.xml test/tools/tool2/tool2.xml
         git log
+        git diff --name-only '${{ github.event.before }}..' --
     - name: Fake a Planemo run to update cache and determine commit range, repositories, and chunks
       # TODO uses: ./
       uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
