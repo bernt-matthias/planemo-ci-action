@@ -51,7 +51,9 @@ jobs:
       uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
       with:
         lint-mode: true
-        repository-list: "test/tools/tool1%0D%0Atest/tools/tool2"
+        repository-list: |
+          test/tools/tool1
+          test/tools/tool2
         tool-list: "test/tools/tool1/tool1.xml%0D%0Atest/tools/tool2/tool2.xml" 
 
     - name: Planemo lint workflows
