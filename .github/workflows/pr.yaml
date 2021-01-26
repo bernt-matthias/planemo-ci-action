@@ -63,15 +63,12 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: BUMP TOOLS
+    - name: Introduce a change on test tool1
       run: |
         git config --global user.name "Arthur Dent"
         git config --global user.email "a.dent@galaxyproject.org"
         echo "" >> test/tools/tool1/tool1.xml
-        echo "" >> test/tools/tool2/tool2.xml
-        git commit -m bump test/tools/tool1/tool1.xml test/tools/tool2/tool2.xml
-        git log
-        git diff --name-only '${{ github.event.before }}..' --
+        git commit -m bump test/tools/tool1/tool1.xml
     - name: Fake a Planemo run to update cache and determine commit range, repositories, and chunks
       # TODO uses: ./
       uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
@@ -84,14 +81,16 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Show commit range
       run: echo ${{ steps.discover.outputs.commit-range }}
-    - name: Show repository list
-      run: echo "${{ steps.discover.outputs.repository-list }}"
-    - name: Show tool list
-      run: echo "${{ steps.discover.outputs.tool-list }}"
-    - name: Show chunks
+    - name: Check content of repository list
       run: |
-        echo 'Using ${{ steps.discover.outputs.chunk-count }} chunks (${{ steps.discover.outputs.chunk-list }})'
-
+        if ! grep -q "tool1" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then exit 1; fi
+        if grep -q "tool2" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then exit 1; fi
+    - name: Check content of tool list
+      run: |
+        if ! grep -q "tool1.xml" <<<$(echo "${{ steps.discover.outputs.tool-list }}"); then exit 1; fi
+        if grep -q "tool2.xml" <<<$(echo "${{ steps.discover.outputs.tool-list }}"); then exit 1; fi
+    - name: Check number of chunks
+      run: if [ "${{ steps.discover.outputs.chunk-count }}" != "1" ]; then exit 1; fi
 
   lint:
     name: Test linting
