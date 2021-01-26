@@ -67,7 +67,7 @@ jobs:
       run: |
         echo "" >> test/tools/tool1/tool1.xml
         echo "" >> test/tools/tool1/tool2.xml
-        commit -m bump test/tools/tool1/tool1.xml test/tools/tool1/tool2.xml
+        git commit -m bump test/tools/tool1/tool1.xml test/tools/tool1/tool2.xml
     - name: Fake a Planemo run to update cache and determine commit range, repositories, and chunks
       uses: galaxyproject/planemo-ci-action@master
       id: discover
