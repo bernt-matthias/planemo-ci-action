@@ -71,7 +71,8 @@ jobs:
         echo "" >> test/tools/tool2/tool2.xml
         git commit -m bump test/tools/tool1/tool1.xml test/tools/tool2/tool2.xml
     - name: Fake a Planemo run to update cache and determine commit range, repositories, and chunks
-      uses: galaxyproject/planemo-ci-action@master
+      # TODO uses: ./
+      uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
       id: discover
       with:
         create-cache: ${{ steps.cache-pip.outputs.cache-hit != 'true' || steps.cache-planemo.outputs.cache-hit != 'true' }}
