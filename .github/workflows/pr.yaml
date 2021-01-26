@@ -17,7 +17,7 @@ jobs:
       uses: ludeeus/action-shellcheck@master
 
   setup:
-    name: Setup cache and determine changed repositories
+    name: Setup cache and determine changed repositories (as in PR)
     runs-on: ubuntu-latest
     outputs:
       galaxy-head-sha: ${{ steps.get-galaxy-sha.outputs.galaxy-head-sha }}
