@@ -54,7 +54,9 @@ jobs:
         repository-list: |
           test/tools/tool1
           test/tools/tool2
-        tool-list: "test/tools/tool1/tool1.xml%0D%0Atest/tools/tool2/tool2.xml" 
+        tool-list: |
+          test/tools/tool1/tool1.xml
+          test/tools/tool2/tool2.xml
 
     - name: Planemo lint workflows
       # TODO uses: ./
