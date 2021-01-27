@@ -17,7 +17,7 @@ jobs:
       uses: ludeeus/action-shellcheck@master
 
   setup-pr-tools:
-    name: Setup cache and determine changed repositories (as in PR)
+    name: Setup as in PR for tools
     runs-on: ubuntu-latest
     outputs:
       galaxy-head-sha: ${{ steps.get-galaxy-sha.outputs.galaxy-head-sha }}
@@ -79,8 +79,8 @@ jobs:
         galaxy-branch: ${{ env.GALAXY_BRANCH }}
         max-chunks: ${{ env.MAX_CHUNKS }}
         python-version: ${{ matrix.python-version }}
-    - name: Show commit range
-      run: echo ${{ steps.discover.outputs.commit-range }}
+    - name: Check commit range
+      run: if ! grep "\.\." <<<$(echo ${{ steps.discover.outputs.commit-range }}); then exit 1; fi
     - name: Check content of repository list
       run: |
         if ! grep -q "tool1" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then exit 1; fi
@@ -93,7 +93,7 @@ jobs:
       run: if [ "${{ steps.discover.outputs.chunk-count }}" != "1" ]; then exit 1; fi
 
   setup-ci-tools:
-    name: Setup cache and determine changed repositories (as in CI)
+    name: Setup as in CI for tools
     runs-on: ubuntu-latest
     outputs:
       galaxy-head-sha: ${{ steps.get-galaxy-sha.outputs.galaxy-head-sha }}
@@ -126,7 +126,8 @@ jobs:
       with:
         fetch-depth: 1
     - name: Fake a Planemo run to update cache and determine commit range, repositories, and chunks
-      uses: galaxyproject/planemo-ci-action@master
+      # TODO uses: ./
+      uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
       id: discover
       env:
         GITHUB_EVENT_NAME: schedule
@@ -136,6 +137,8 @@ jobs:
         galaxy-branch: ${{ env.GALAXY_BRANCH }}
         max-chunks: ${{ env.MAX_CHUNKS }}
         python-version: ${{ matrix.python-version }}
+    - name: Check commit range
+      run: if [ -n "${{ steps.discover.outputs.commit-range }}" ]; then exit 1; fi
     - name: Show repository list
       run: echo "${{ steps.discover.outputs.repository-list }}"
     - name: Show chunks
