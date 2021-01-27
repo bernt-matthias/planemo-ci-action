@@ -16,7 +16,7 @@ jobs:
     - name: Run ShellCheck
       uses: ludeeus/action-shellcheck@master
 
-  setup:
+  setup-pr-tools:
     name: Setup cache and determine changed repositories (as in PR)
     runs-on: ubuntu-latest
     outputs:
@@ -92,7 +92,7 @@ jobs:
     - name: Check number of chunks
       run: if [ "${{ steps.discover.outputs.chunk-count }}" != "1" ]; then exit 1; fi
 
-  setup:
+  setup-ci-tools:
     name: Setup cache and determine changed repositories (as in CI)
     runs-on: ubuntu-latest
     outputs:
