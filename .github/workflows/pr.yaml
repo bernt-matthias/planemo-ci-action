@@ -270,5 +270,71 @@ jobs:
       with:
         mode: lint
         workflows: true
-        repository-list: "test/tools/example3/"
+        repository-list: "${{ needs.setup-pr-workflows.outputs.repository-list }}"
         tool-list: "IGNORED AT THE MOMENT"
+
+  test:
+    name: Test testing of tools and worflows
+    needs: [setup-pr-tools, setup-pr-workflows]
+    runs-on: ubuntu-latest
+    needs: setup
+    strategy:
+      fail-fast: false
+      matrix:
+        chunk: ${{ fromJson(needs.setup.outputs.chunk-list) }}
+        python-version: [3.7]
+    services:
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+    steps:
+    # checkout the repository
+    # and use it as the current working directory
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    - uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Cache .cache/pip
+      uses: actions/cache@v2
+      id: cache-pip
+      with:
+        path: ~/.cache/pip
+        key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup.outputs.galaxy-head-sha }}
+    - name: Planemo test tools
+      # TODO uses: ./
+      uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
+      id: test-tools
+      with:
+        mode: test
+        repository-list: ${{ needs.setup-tools.outputs.repository-list }}
+        galaxy-fork: ${{ env.GALAXY_FORK }}
+        galaxy-branch: ${{ env.GALAXY_BRANCH }}
+        chunk: ${{ matrix.chunk }}
+        chunk-count: ${{ needs.setup-tools.outputs.chunk-count }}
+    - uses: actions/upload-artifact@v2
+      with:
+        name: 'Tool test output ${{ matrix.chunk }}'
+        path: upload
+    - name: Planemo test workflows
+      # TODO uses: ./
+      uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
+      id: test-workflows
+      with:
+        mode: test
+        workflows: true
+        repository-list: ${{ needs.setup-tools.outputs.repository-list }}
+        galaxy-fork: ${{ env.GALAXY_FORK }}
+        galaxy-branch: ${{ env.GALAXY_BRANCH }}
+        chunk: ${{ matrix.chunk }}
+        chunk-count: ${{ needs.setup-tools.outputs.chunk-count }}
+    - uses: actions/upload-artifact@v2
+      with:
+        name: 'Workflow test output ${{ matrix.chunk }}'
+        path: upload
