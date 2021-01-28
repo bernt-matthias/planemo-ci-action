@@ -154,7 +154,7 @@ jobs:
 
   lint:
     name: Test linting of tools and workflows
-    needs: [setup-pr-tools, setup-pr-workflows]
+    needs: [setup-pr-workflows]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -171,7 +171,7 @@ jobs:
       id: cache-pip
       with:
         path: ~/.cache/pip
-        key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup.outputs.galaxy-head-sha }}
+        key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-pr-workflows.outputs.galaxy-head-sha }}
     - name: Install wheel
       run: pip install wheel
     - name: Planemo lint workflows
