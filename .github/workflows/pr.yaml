@@ -185,7 +185,7 @@ jobs:
       # TODO uses: ./
       uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
       with:
-        lint-mode: true
+        mode: lint
         repository-list: |
           test/tools/tool1
           test/tools/tool2
