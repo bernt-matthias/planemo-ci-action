@@ -155,7 +155,7 @@ jobs:
 
   lint:
     name: Test linting of tools and workflows
-    needs: [setup-pr-tools]
+    needs: [setup-ci-tools]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -172,7 +172,7 @@ jobs:
       id: cache-pip
       with:
         path: ~/.cache/pip
-        key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-pr-tools.outputs.galaxy-head-sha }}
+        key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-ci-tools.outputs.galaxy-head-sha }}
     - name: Install wheel
       run: pip install wheel
     - name: Planemo lint tools
@@ -180,8 +180,8 @@ jobs:
       uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
       with:
         mode: lint
-        repository-list: ${{ needs.setup-pr-tools.outputs.repository-list }}
-        tool-list: ${{ needs.setup-pr-tools.outputs.tool-list }}
+        repository-list: ${{ needs.setup-ci-tools.outputs.repository-list }}
+        tool-list: ${{ needs.setup-ci-tools.outputs.tool-list }}
 
   test-tools:
     name: Test testing of tools
@@ -260,6 +260,10 @@ jobs:
       with:
         mode: combine
         html-report: true
+    - name: Check statistics
+      run: |
+        echo "${{ steps.combine.outputs.statistics }}"
+        grep "2\s+success" <<<$(echo ${{ steps.combine.outputs.statistics }})
     - uses: actions/upload-artifact@v2
       with:
         name: 'All tool test results'
