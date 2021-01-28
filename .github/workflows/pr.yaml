@@ -359,7 +359,8 @@ jobs:
         path: ~/.cache/pip
         key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-pr-tools.outputs.galaxy-head-sha }}
     - name: Combine outputs
-      uses: galaxyproject/planemo-ci-action@master
+      # TODO uses: ./
+      uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
       id: combine
       with:
         mode: combine
@@ -369,7 +370,8 @@ jobs:
         name: 'All tool test results'
         path: upload
     - name: Check outputs
-      uses: galaxyproject/planemo-ci-action@master
+      # TODO uses: ./
+      uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
       id: check
       with:
         mode: check
