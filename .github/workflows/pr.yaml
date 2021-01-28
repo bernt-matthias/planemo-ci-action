@@ -156,8 +156,6 @@ jobs:
         galaxy-branch: ${{ env.GALAXY_BRANCH }}
         max-chunks: ${{ env.MAX_CHUNKS }}
         python-version: ${{ matrix.python-version }}
-    - name: debug
-      run: echo ${{ steps.discover.outputs.tool-list }}"
     - name: Check commit range
       run: if ! grep "\.\." <<<$(echo ${{ steps.discover.outputs.commit-range }}); then exit 1; fi
     - name: Check content of repository list
