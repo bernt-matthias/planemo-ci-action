@@ -164,7 +164,7 @@ jobs:
         if grep -q "example4" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then exit 1; fi
     - name: Check content of tool list
       run: |
-        if [ -n "${{ steps.discover.outputs.tool-list }}"]; then exit 1; fi
+        if [ -n "${{ steps.discover.outputs.tool-list }}" ]; then exit 1; fi
     - name: Check number of chunks
       run: if [ "${{ steps.discover.outputs.chunk-count }}" != "1" ]; then exit 1; fi
 
