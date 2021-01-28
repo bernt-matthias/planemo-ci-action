@@ -305,18 +305,18 @@ jobs:
       id: cache-pip
       with:
         path: ~/.cache/pip
-        key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup.outputs.galaxy-head-sha }}
+        key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-pr-tools.outputs.galaxy-head-sha }}
     - name: Planemo test tools
       # TODO uses: ./
       uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
       id: test-tools
       with:
         mode: test
-        repository-list: ${{ needs.setup-tools.outputs.repository-list }}
+        repository-list: ${{ needs.setup-pr-tools.outputs.repository-list }}
         galaxy-fork: ${{ env.GALAXY_FORK }}
         galaxy-branch: ${{ env.GALAXY_BRANCH }}
         chunk: ${{ matrix.chunk }}
-        chunk-count: ${{ needs.setup-tools.outputs.chunk-count }}
+        chunk-count: ${{ needs.setup-pr-tools.outputs.chunk-count }}
     - uses: actions/upload-artifact@v2
       with:
         name: 'Tool test output ${{ matrix.chunk }}'
@@ -328,12 +328,49 @@ jobs:
       with:
         mode: test
         workflows: true
-        repository-list: ${{ needs.setup-tools.outputs.repository-list }}
+        repository-list: ${{ needs.setup-pr-workflows.outputs.repository-list }}
         galaxy-fork: ${{ env.GALAXY_FORK }}
         galaxy-branch: ${{ env.GALAXY_BRANCH }}
         chunk: ${{ matrix.chunk }}
-        chunk-count: ${{ needs.setup-tools.outputs.chunk-count }}
+        chunk-count: ${{ needs.setup-pr-workflows-tools.outputs.chunk-count }}
     - uses: actions/upload-artifact@v2
       with:
         name: 'Workflow test output ${{ matrix.chunk }}'
         path: upload
+
+  combine_outputs:
+    name: Test combining 'chunked' test results
+    needs: [setup-pr-tools, setup-pr-workflows, test]
+    strategy:
+      matrix:
+        python-version: [3.7]
+    # This job runs on Linux
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        path: artifacts
+    - uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Cache .cache/pip
+      uses: actions/cache@v2
+      id: cache-pip
+      with:
+        path: ~/.cache/pip
+        key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-pr-tools.outputs.galaxy-head-sha }}
+    - name: Combine outputs
+      uses: galaxyproject/planemo-ci-action@master
+      id: combine
+      with:
+        mode: combine
+        html-report: true
+    - uses: actions/upload-artifact@v2
+      with:
+        name: 'All tool test results'
+        path: upload
+    - name: Check outputs
+      uses: galaxyproject/planemo-ci-action@master
+      id: check
+      with:
+        check-mode: true
