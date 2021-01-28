@@ -440,7 +440,7 @@ jobs:
 
   combine_outputs:
     name: Test combining 'chunked' test results
-    needs: [setup-pr-tools, setup-pr-workflows, test]
+    needs: [setup-pr-tools, setup-pr-workflows, test-tools]
     strategy:
       matrix:
         python-version: [3.7]
