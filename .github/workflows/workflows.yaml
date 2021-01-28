@@ -188,7 +188,7 @@ jobs:
         tool-list: "${{ needs.setup-ci-workflows.outputs.tool-list }}"
 
   test-workflows:
-    name: Test testing of worflows
+    name: Test testing of workflows
     needs: [setup-ci-workflows]
     runs-on: ubuntu-latest
     strategy:
@@ -242,7 +242,7 @@ jobs:
 
   combine_outputs:
     name: Test combining 'chunked' test results
-    needs: [setup-pr-workflows, test-workflows]
+    needs: [setup-ci-workflows, test-workflows]
     strategy:
       matrix:
         python-version: [3.7]
@@ -260,7 +260,7 @@ jobs:
       id: cache-pip
       with:
         path: ~/.cache/pip
-        key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-pr-tools.outputs.galaxy-head-sha }}
+        key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-ci-tools.outputs.galaxy-head-sha }}
     - name: Combine outputs
       # TODO uses: ./
       uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf

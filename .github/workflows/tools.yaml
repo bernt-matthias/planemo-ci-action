@@ -234,7 +234,7 @@ jobs:
 
   combine_outputs:
     name: Test combining 'chunked' test results
-    needs: [setup-pr-tools, test-tools]
+    needs: [setup-ci-tools, test-tools]
     strategy:
       matrix:
         python-version: [3.7]
@@ -252,7 +252,7 @@ jobs:
       id: cache-pip
       with:
         path: ~/.cache/pip
-        key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-pr-tools.outputs.galaxy-head-sha }}
+        key: pip_cache_py_${{ matrix.python-version }}_gxy_${{ needs.setup-ci-tools.outputs.galaxy-head-sha }}
     - name: Combine outputs
       # TODO uses: ./
       uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
