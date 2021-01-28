@@ -200,6 +200,8 @@ jobs:
       run: pip install wheel
     - uses: actions/checkout@v2
       with:
+        # TODO main
+        ref: master
         fetch-depth: 1
     - name: Fake a Planemo run to update cache and determine commit range, repositories, and chunks
       # TODO uses: ./
@@ -213,23 +215,20 @@ jobs:
         galaxy-branch: ${{ env.GALAXY_BRANCH }}
         max-chunks: ${{ env.MAX_CHUNKS }}
         python-version: ${{ matrix.python-version }}
+        github-event-name-override: 'schedule'
+
     - name: Check commit range
-      run: if [ -n "${{ steps.discover.outputs.commit-range }}" ]; then exit 1; fi
-    - name: Show repository list
-      run: echo "${{ steps.discover.outputs.repository-list }}"
-    - name: Show chunks
-      run: |
-        echo 'Using ${{ steps.discover.outputs.chunk-count }} chunks (${{ steps.discover.outputs.chunk-list }})'
+      run: if [ -z "${{ steps.discover.outputs.commit-range }}" ]; then exit 1; fi
     - name: Check content of repository list
       run: |
         if ! grep -q "tool1" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then exit 1; fi
-        if grep -q "tool2" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then exit 1; fi
+        if ! grep -q "tool2" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then exit 1; fi
     - name: Check content of tool list
       run: |
         if ! grep -q "tool1.xml" <<<$(echo "${{ steps.discover.outputs.tool-list }}"); then exit 1; fi
-        if grep -q "tool2.xml" <<<$(echo "${{ steps.discover.outputs.tool-list }}"); then exit 1; fi
+        if ! grep -q "tool2.xml" <<<$(echo "${{ steps.discover.outputs.tool-list }}"); then exit 1; fi
     - name: Check number of chunks
-      run: if [ "${{ steps.discover.outputs.chunk-count }}" != "1" ]; then exit 1; fi
+      run: if[ "${{ steps.discover.outputs.chunk-count }}" != "2" ]; then exit 1; fi
   
   lint:
     name: Test linting of tools and workflows
