@@ -279,6 +279,7 @@ jobs:
       env:
         GITHUB_EVENT_NAME: schedule
       with:
+        workflows: true
         create-cache: true
         galaxy-fork: ${{ env.GALAXY_FORK }}
         galaxy-branch: ${{ env.GALAXY_BRANCH }}
@@ -440,7 +441,7 @@ jobs:
 
   combine_outputs:
     name: Test combining 'chunked' test results
-    needs: [setup-pr-tools, setup-pr-workflows, test-tools]
+    needs: [setup-pr-tools, test-tools]
     strategy:
       matrix:
         python-version: [3.7]
