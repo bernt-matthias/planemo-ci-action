@@ -77,15 +77,15 @@ jobs:
         max-chunks: ${{ env.MAX_CHUNKS }}
         python-version: ${{ matrix.python-version }}
     - name: Check commit range
-      run: if ! grep "\.\." <<<$(echo ${{ steps.discover.outputs.commit-range }}); then exit 1; fi
+      run: if ! grep "\.\." <<<$(echo ${{ steps.discover.outputs.commit-range }}); then echo "wrong commit range"; exit 1; fi
     - name: Check content of repository list
       run: |
-        if ! grep -q "example3" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then exit 1; fi
-        if grep -q "example4" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then exit 1; fi
+        if ! grep -q "example3" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then echo "example3 must be in repo list"; exit 1; fi
+        if grep -q "example4" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then echo "example4 must not be in repo list"; exit 1; fi
     - name: Check content of tool list
-      run: if [ -n "${{ steps.discover.outputs.tool-list }}" ]; then exit 1; fi
+      run: if [ -n "${{ steps.discover.outputs.tool-list }}" ]; then echo "tool list must be empty"; exit 1; fi
     - name: Check number of chunks
-      run: if [ "${{ steps.discover.outputs.chunk-count }}" != "1" ]; then exit 1; fi
+      run: if [ "${{ steps.discover.outputs.chunk-count }}" != "1" ]; then echo "wrong chunk-count"; fi
   
   setup-ci-workflows:
     name: Setup as in CI for workflows
@@ -269,9 +269,7 @@ jobs:
         mode: combine
         html-report: true
     - name: Check statistics
-      run: |
-        echo "${{ steps.combine.outputs.statistics }}"
-        grep "2\s+success" <<<$(echo ${{ steps.combine.outputs.statistics }})
+      run: if ! grep -q "2\s\+success" <<<$(echo ${{ steps.combine.outputs.statistics }}); then echo "wrong statistics"; exit 1; fi
     - uses: actions/upload-artifact@v2
       with:
         name: 'All tool test results'

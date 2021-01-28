@@ -1,7 +1,7 @@
 
 on: [push, pull_request]
 
-name: 'Shellcheck: Push action'
+name: 'Shellcheck'
 
 jobs:
   shellcheck:

@@ -73,17 +73,17 @@ jobs:
         max-chunks: ${{ env.MAX_CHUNKS }}
         python-version: ${{ matrix.python-version }}
     - name: Check commit range
-      run: if ! grep "\.\." <<<$(echo ${{ steps.discover.outputs.commit-range }}); then exit 1; fi
+      run: if ! grep "\.\." <<<$(echo ${{ steps.discover.outputs.commit-range }}); then echo "wrong commit range"; exit 1; fi
     - name: Check content of repository list
       run: |
-        if ! grep -q "tool1" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then exit 1; fi
-        if grep -q "tool2" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then exit 1; fi
+        if ! grep -q "tool1" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then echo "tool1 must be in repo list"; exit 1; fi
+        if grep -q "tool2" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then echo "tool2 must not be in repo list"; exit 1; fi
     - name: Check content of tool list
       run: |
-        if ! grep -q "tool1.xml" <<<$(echo "${{ steps.discover.outputs.tool-list }}"); then exit 1; fi
-        if grep -q "tool2.xml" <<<$(echo "${{ steps.discover.outputs.tool-list }}"); then exit 1; fi
+        if ! grep -q "tool1.xml" <<<$(echo "${{ steps.discover.outputs.tool-list }}"); then echo "tool1.xml must be in tool list"; exit 1; fi
+        if grep -q "tool2.xml" <<<$(echo "${{ steps.discover.outputs.tool-list }}"); then echo "tool2.xml must not be in tool list"; exit 1; fi
     - name: Check number of chunks
-      run: if [ "${{ steps.discover.outputs.chunk-count }}" != "1" ]; then exit 1; fi
+      run: if [ "${{ steps.discover.outputs.chunk-count }}" != "1" ]; then echo "wrong chunk-count"; exit 1; fi
 
   setup-ci-tools:
     name: Setup as in CI for tools
@@ -261,9 +261,7 @@ jobs:
         mode: combine
         html-report: true
     - name: Check statistics
-      run: |
-        echo "${{ steps.combine.outputs.statistics }}"
-        grep "2\s+success" <<<$(echo ${{ steps.combine.outputs.statistics }})
+      run: if ! grep -q "2\s\+success" <<<$(echo ${{ steps.combine.outputs.statistics }}); then echo "wrong statistics"; exit 1; fi
     - uses: actions/upload-artifact@v2
       with:
         name: 'All tool test results'
