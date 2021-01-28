@@ -336,7 +336,7 @@ jobs:
         galaxy-fork: ${{ env.GALAXY_FORK }}
         galaxy-branch: ${{ env.GALAXY_BRANCH }}
         chunk: ${{ matrix.chunk }}
-        chunk-count: ${{ needs.setup-pr-workflows-tools.outputs.chunk-count }}
+        chunk-count: ${{ needs.setup-pr-workflows.outputs.chunk-count }}
     - uses: actions/upload-artifact@v2
       with:
         name: 'Workflow test output ${{ matrix.chunk }}'
