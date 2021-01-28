@@ -277,7 +277,6 @@ jobs:
     name: Test testing of tools and worflows
     needs: [setup-pr-tools, setup-pr-workflows]
     runs-on: ubuntu-latest
-    needs: setup
     strategy:
       fail-fast: false
       matrix:
