@@ -325,7 +325,6 @@ jobs:
       with:
         name: 'Tool test output ${{ matrix.chunk }}'
         path: upload
-    - name: Planemo test workflows
       # TODO uses: ./
       uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
       id: test-workflows
@@ -377,4 +376,4 @@ jobs:
       uses: galaxyproject/planemo-ci-action@master
       id: check
       with:
-        check-mode: true
+        mode: check
