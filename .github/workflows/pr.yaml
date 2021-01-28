@@ -217,17 +217,19 @@ jobs:
         python-version: ${{ matrix.python-version }}
         github-event-name-override: 'schedule'
 
-    - name: Check commit range
-      run: if [ -z "${{ steps.discover.outputs.commit-range }}" ]; then exit 1; fi
-    - name: Check content of repository list
+    - name: Check for empty commit range
+      run: if [ -n "${{ steps.discover.outputs.commit-range }}" ]; then exit 1; fi
+    - name: Check that all tools an workflows are in the repository list
       run: |
         if ! grep -q "tool1" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then exit 1; fi
         if ! grep -q "tool2" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then exit 1; fi
-    - name: Check content of tool list
+        if ! grep -q "example3" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then exit 1; fi
+        if ! grep -q "example4" <<<$(echo "${{ steps.discover.outputs.repository-list }}"); then exit 1; fi
+    - name: Check that all tools are in the tool list
       run: |
         if ! grep -q "tool1.xml" <<<$(echo "${{ steps.discover.outputs.tool-list }}"); then exit 1; fi
         if ! grep -q "tool2.xml" <<<$(echo "${{ steps.discover.outputs.tool-list }}"); then exit 1; fi
-    - name: Check number of chunks
+    - name: Check that the number of chunks is two, i.e. the number of tools
       run: if[ "${{ steps.discover.outputs.chunk-count }}" != "2" ]; then exit 1; fi
   
   lint:
