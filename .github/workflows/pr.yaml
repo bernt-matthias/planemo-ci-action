@@ -186,12 +186,8 @@ jobs:
       uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
       with:
         mode: lint
-        repository-list: |
-          test/tools/tool1
-          test/tools/tool2
-        tool-list: |
-          test/tools/tool1/tool1.xml
-          test/tools/tool2/tool2.xml
+        repository-list: ${{ needs.setup-pr-tools.outputs.repository-list }}
+        tool-list: ${{ needs.setup-pr-tools.outputs.tool-list }} 
     - name: Planemo lint workflows
       # TODO uses: ./
       uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
