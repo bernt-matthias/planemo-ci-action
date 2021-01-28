@@ -264,6 +264,8 @@ jobs:
         mode: lint
         repository-list: ${{ needs.setup-pr-tools.outputs.repository-list }}
         tool-list: ${{ needs.setup-pr-tools.outputs.tool-list }}
+    - name: debug
+      run: echo ${{ needs.setup-pr-workflows.outputs.tool-list }}"
     - name: Planemo lint workflows
       # TODO uses: ./
       uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
