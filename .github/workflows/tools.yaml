@@ -1,6 +1,6 @@
 on: [push, pull_request]
 
-name: 'Test action for workflows'
+name: 'Test action for tools'
 
 env:
   GALAXY_FORK: galaxyproject
