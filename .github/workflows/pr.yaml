@@ -271,7 +271,7 @@ jobs:
         mode: lint
         workflows: true
         repository-list: "${{ needs.setup-pr-workflows.outputs.repository-list }}"
-        tool-list: "IGNORED AT THE MOMENT"
+        tool-list: ${{ needs.setup-pr-workflows.outputs.tool-list }}"
 
   test:
     name: Test testing of tools and worflows
