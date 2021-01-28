@@ -203,6 +203,8 @@ jobs:
         # TODO main
         ref: master
         fetch-depth: 1
+    - name: TEST
+      run: echo 'test/workflows/' > .tt_skip
     - name: Fake a Planemo run to update cache and determine commit range, repositories, and chunks
       # TODO uses: ./
       uses: bernt-matthias/planemo-ci-action@topic/ci-for-wf
