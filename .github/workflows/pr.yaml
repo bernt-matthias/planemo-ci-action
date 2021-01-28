@@ -157,6 +157,7 @@ jobs:
   
   lint:
     name: Test linting
+    needs: setup-pr-tools
     runs-on: ubuntu-latest
     strategy:
       matrix:
