@@ -169,7 +169,7 @@ if [ "$MODE" == "test" ]; then
       PLANEMO_OPTIONS+=("${PLANEMO_WORKFLOW_OPTIONS[@]}")
     fi  
     json=$(mktemp -u -p json_output --suff .json)
-    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" || true
+    PIP_QUIET=1 planemo test "${PLANEMO_OPTIONS[@]}" "${PLANEMO_TEST_OPTIONS[@]}" --test_output_json "$json" "${TOOL_GROUP[@]}" "${ADDITIONAL_PLANEMO_OPTIONS[@]}" --random_id_secret || true
     docker system prune --all --force --volumes || true
   done < tool_list_chunk.txt
 
