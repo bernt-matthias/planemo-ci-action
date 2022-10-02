@@ -6,7 +6,7 @@ Installs planemo, discovers changed workflows and tools, and allows to lint, tes
 The reference use cases of this action are the [pull request](https://github.com/galaxyproject/tools-iuc/blob/master/.github/workflows/pr.yaml) and [continuous integration](https://github.com/galaxyproject/tools-iuc/blob/master/.github/workflows/ci.yaml) workflows of the [intergalactic utility comission (IUC)](https://github.com/galaxyproject/tools-iuc/).
 
 
-The action runs in one of six modes which are controled with the `mode` input. Possible values are:
+The action runs in one of seven modes which are controled with the `mode` input. Possible values are:
 
 - `setup`: This is the default. 
   - Optionally do a fake `planemo test` run to fill `.cache/pip`  and `.planemo` for caching.
@@ -18,6 +18,7 @@ The action runs in one of six modes which are controled with the `mode` input. P
 - `combine`: Combine the outputs from individual tool tests (`planemo merge_test_reports`) and create html/markdown reports (`planemo test_reports`).
 - `check`: Check if any of the tool tests failed.
 - `deploy`: Deploy tools to a toolshed using `planemo shed_update` and workflows to a github namespace, resp.
+- `autoupdate`: Autoupdate tools or workflows with `planemo autoupdate`.
 
 If none of these modes is set then a setup mode runs.
 
@@ -39,6 +40,8 @@ Tools/workflows in a path that has a prefix in:
 
 - `.tt_skip` are ignored in all modes
 - `.tt_biocontainer_skip` are not tested using containers but conda is used for resolving requirements.
+
+Additionally a file `.autoupdate_skip` can list repositories that should be ignored in the `autoupdate` mode.
 
 Tools and workflows are discovered in all directories, except for `packages/` and `deprecated/`. These directories may be absent.
 
@@ -165,3 +168,14 @@ Required inputs:
 - `workflow-namespace`
 - `shed-target` toolshed name (e.g. `"toolshed"` or `"testtoolshed"`)
 - `shed-key` API key for the toolshed
+
+Autoupdate mode
+---------------
+
+Autoupdate tools in each repository 
+
+- `repository-list`: List of repositories
+
+Output:
+
+- creates a file `autoupdate_report.txt`

@@ -220,3 +220,14 @@ if [ "$MODE" == "deploy" ]; then
     fi
   done
 fi
+
+# autoupdate mode
+# - call `planemo autoupdate` for each repo
+if [ "$MODE" == "autoupdate" ]; then
+  touch .autoupdate_skip
+  mapfile -t REPO_ARRAY < repository_list.txt
+  for DIR in "${REPO_ARRAY[@]}"; do
+    echo "autoupdating $DIR"
+    planemo autoupdate --skiplist .autoupdate_skip $DIR | tee -a autoupdate_report.txt
+  done
+fi
