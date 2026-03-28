@@ -46,7 +46,7 @@ A global `.lint_skip` file and per repo `.lint_skip` files can be used to list t
 
 For workflow repositories a `.wt_instance` contains the instance to run the workflow test against
 (note that the instance must not contain the trailing `https://`).
-In order to be able to use this, an API key for the instance used in the repo needs to be defined.
+In order to be able to use this, an API key for the instance used in the repo needs to be passed via `galaxy-user-key`.
 If multiple instance are used in the repository (each `.wt_instance` can contain only one instance, 
 but multiple ones may be used for the whole repo) the secret can be json formatted as follows:
 
@@ -133,6 +133,7 @@ Optional inputs:
 - `additional-planemo-options`: additional options passed to `planemo test`, see for instance [here](https://github.com/galaxyproject/planemo-ci-action/blob/657582777416fc51b6171961d90dced7dacbeea2/.github/workflows/tools.yaml#L229)
 - `galaxy-slots`: number of slots (threads) to use in Galaxy jobs (sets the `GALAXY_SLOTS` environment variable)
 - `test_timeout`:  Maximum runtime of a single test in seconds, default: 86400
+- `galaxy-user-key`: API key(s) used for testing agains online instances (note: use secrets for this). See "Assumptions on the repository".
 
 Output:
 
