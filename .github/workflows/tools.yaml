@@ -183,6 +183,7 @@ jobs:
     - name: check if all test tools were linted
       run: |
         set -x
+        cat lint_report.txt
         # check if the ToolIDValid linter is called (no of tools - 1 ) times, i.e. is skipped once
         if [ "$(grep -c ToolIDValid lint_report.txt)" != "3" ]; then
           echo "expecting exactly 2 tests for ToolIDValid"; exit 1; 
