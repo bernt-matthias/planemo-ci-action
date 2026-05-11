@@ -180,7 +180,7 @@ if [ "$MODE" == "test" ]; then
     if [ -f "${TOOL_GROUP[*]}/".wt_instance ]; then
       INSTANCE=$(cat "${TOOL_GROUP[*]}/.wt_instance")
       set +x
-      PLANEMO_GALAXY_USER_KEY="$(jq -r --arg instance "$INSTANCE" '.[$instance]' <<<"$GALAXY_USER_KEY" || echo $GALAXY_USER_KEY)"
+      PLANEMO_GALAXY_USER_KEY="$(jq -r --arg instance "$INSTANCE" '.[$instance]' <<<"$GALAXY_USER_KEY" || echo "$GALAXY_USER_KEY")"
       export PLANEMO_GALAXY_USER_KEY
       echo "::add-mask::$PLANEMO_GALAXY_USER_KEY"
       set -x
