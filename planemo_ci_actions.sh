@@ -175,6 +175,7 @@ if [ "$MODE" == "test" ]; then
       PLANEMO_OPTIONS+=("${PLANEMO_WORKFLOW_OPTIONS[@]}")
     fi
 
+
     ## TODO concatenating, ie TOOL_GROUP[*] might not work with multiple WF in a group
     ## Can this happen??
     if [ -f "${TOOL_GROUP[*]}/".wt_instance ]; then
