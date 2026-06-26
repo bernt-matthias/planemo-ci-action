@@ -180,7 +180,6 @@ jobs:
 
   test-workflows:
     name: Test testing of workflows
-    environment: pr-secrets
     needs: [setup-ci-workflows]
     runs-on: ubuntu-latest
     strategy:
